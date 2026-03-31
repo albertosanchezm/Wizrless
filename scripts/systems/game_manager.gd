@@ -6,6 +6,7 @@ extends Node
 signal ability_unlocked(ability_name: String)
 signal health_changed(current: int, maximum: int)
 signal player_died
+signal attack_cooldown_changed(remaining: float, total: float)
 
 # --- Habilidades desbloqueables ---
 var abilities: Dictionary = {

@@ -29,7 +29,7 @@ func _update(_delta: float) -> void:
 		dispatch(&"dash")
 		return
 
-	if Input.is_action_just_pressed("attack"):
+	if _p.wants_attack():
 		dispatch(&"attack")
 		return
 

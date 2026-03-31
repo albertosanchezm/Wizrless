@@ -1,0 +1,104 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_script"]
+
+[node name="HUD" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_script")
+
+[node name="Control" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TopLeft" type="VBoxContainer" parent="Control"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 128.0
+offset_bottom = 48.0
+theme_override_constants/separation = 2
+
+[node name="HealthLabel" type="Label" parent="Control/TopLeft"]
+text = "VIDA"
+theme_override_font_sizes/font_size = 8
+
+[node name="Hearts" type="HBoxContainer" parent="Control/TopLeft"]
+theme_override_constants/separation = 2
+
+[node name="Heart1" type="ColorRect" parent="Control/TopLeft/Hearts"]
+custom_minimum_size = Vector2(10, 10)
+color = Color(0.85, 0.15, 0.15, 1)
+
+[node name="Heart2" type="ColorRect" parent="Control/TopLeft/Hearts"]
+custom_minimum_size = Vector2(10, 10)
+color = Color(0.85, 0.15, 0.15, 1)
+
+[node name="Heart3" type="ColorRect" parent="Control/TopLeft/Hearts"]
+custom_minimum_size = Vector2(10, 10)
+color = Color(0.85, 0.15, 0.15, 1)
+
+[node name="Heart4" type="ColorRect" parent="Control/TopLeft/Hearts"]
+custom_minimum_size = Vector2(10, 10)
+color = Color(0.85, 0.15, 0.15, 1)
+
+[node name="Heart5" type="ColorRect" parent="Control/TopLeft/Hearts"]
+custom_minimum_size = Vector2(10, 10)
+color = Color(0.85, 0.15, 0.15, 1)
+
+[node name="Heart6" type="ColorRect" parent="Control/TopLeft/Hearts"]
+custom_minimum_size = Vector2(10, 10)
+color = Color(0.85, 0.15, 0.15, 1)
+
+[node name="TopRight" type="VBoxContainer" parent="Control"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -90.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 48.0
+theme_override_constants/separation = 2
+
+[node name="FireballLabel" type="Label" parent="Control/TopRight"]
+text = "BOLA DE FUEGO"
+theme_override_font_sizes/font_size = 8
+
+[node name="CooldownBar" type="ProgressBar" parent="Control/TopRight"]
+custom_minimum_size = Vector2(82, 6)
+max_value = 1.0
+value = 1.0
+show_percentage = false
+
+[node name="CooldownLabel" type="Label" parent="Control/TopRight"]
+text = "LISTA"
+theme_override_font_sizes/font_size = 8
+
+[node name="BottomLeft" type="VBoxContainer" parent="Control"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -36.0
+offset_right = 220.0
+offset_bottom = -8.0
+theme_override_constants/separation = 2
+
+[node name="AbilityLabel" type="Label" parent="Control/BottomLeft"]
+text = "HABILIDADES"
+theme_override_font_sizes/font_size = 8
+
+[node name="Abilities" type="HBoxContainer" parent="Control/BottomLeft"]
+theme_override_constants/separation = 6
+
+[node name="dash" type="Label" parent="Control/BottomLeft/Abilities"]
+text = "DASH"
+theme_override_font_sizes/font_size = 8
+
+[node name="double_jump" type="Label" parent="Control/BottomLeft/Abilities"]
+text = "2xJUMP"
+theme_override_font_sizes/font_size = 8
+
+[node name="wall_jump" type="Label" parent="Control/BottomLeft/Abilities"]
+text = "WALLJUMP"
+theme_override_font_sizes/font_size = 8
+
+[node name="wall_slide" type="Label" parent="Control/BottomLeft/Abilities"]
+text = "WALLSLIDE"
+theme_override_font_sizes/font_size = 8

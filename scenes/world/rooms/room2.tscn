@@ -1,0 +1,82 @@
+[gd_scene format=4 uid="uid://c07mk5c7rxj33"]
+
+[ext_resource type="Script" uid="uid://b1mdmak1r6au4" path="res://scripts/world/room_exit.gd" id="1_exit_script"]
+[ext_resource type="Texture2D" uid="uid://cq1wkvbm5yhry" path="res://assets/sprites/backgrounds/room2_arena_bg.png" id="1_oci0b"]
+[ext_resource type="Texture2D" uid="uid://cwcphhruw0j3b" path="res://assets/sprites/tilesets/temp_tileset.png" id="1_roip8"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_oci0b"]
+texture = ExtResource("1_roip8")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+
+[sub_resource type="TileSet" id="TileSet_srjro"]
+tile_size = Vector2i(32, 32)
+physics_layer_0/collision_layer = 1
+physics_layer_0/collision_mask = 38
+sources/1 = SubResource("TileSetAtlasSource_oci0b")
+
+[sub_resource type="TileSet" id="TileSet_1"]
+physics_layer_0/collision_layer = 1
+physics_layer_0/collision_mask = 0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_exit_l"]
+size = Vector2(16, 360)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_r"]
+size = Vector2(16, 360)
+
+[node name="Room" type="Node2D" unique_id=812498890]
+
+[node name="Background" type="Sprite2D" parent="." unique_id=1464693645]
+position = Vector2(319.25, 191.49998)
+scale = Vector2(0.51531017, 0.49869788)
+texture = ExtResource("1_oci0b")
+
+[node name="Terrain" type="TileMapLayer" parent="." unique_id=849091717]
+tile_map_data = PackedByteArray("AAAAAAsAAQAAAAAAAAABAAsAAQAAAAAAAAACAAsAAQAAAAAAAAADAAsAAQAAAAAAAAAEAAsAAQAAAAAAAAAFAAsAAQAAAAAAAAAGAAsAAQAAAAAAAAAHAAsAAQAAAAAAAAAIAAsAAQAAAAAAAAAJAAsAAQAAAAAAAAAKAAsAAQAAAAAAAAALAAsAAQAAAAAAAAAMAAsAAQAAAAAAAAANAAsAAQAAAAAAAAAOAAsAAQAAAAAAAAAPAAsAAQAAAAAAAAAQAAsAAQAAAAAAAAARAAsAAQAAAAAAAAASAAsAAQAAAAAAAAATAAsAAQAAAAAAAAA=")
+tile_set = SubResource("TileSet_srjro")
+
+[node name="Foreground" type="TileMapLayer" parent="." unique_id=1195900390]
+z_index = 1
+tile_set = SubResource("TileSet_1")
+collision_enabled = false
+
+[node name="SpawnPoints" type="Node2D" parent="." unique_id=1345466288]
+
+[node name="from_room1" type="Marker2D" parent="SpawnPoints" unique_id=1005975186]
+position = Vector2(80, 351)
+
+[node name="from_room2_right" type="Marker2D" parent="SpawnPoints" unique_id=1596953647]
+position = Vector2(592, 300)
+
+[node name="Exits" type="Node2D" parent="." unique_id=1108189]
+
+[node name="ExitLeft" type="Area2D" parent="Exits" unique_id=424096491]
+position = Vector2(0, 180)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_exit_script")
+target_room = "res://scenes/world/rooms/room1.tscn"
+target_spawn = "from_room2"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Exits/ExitLeft" unique_id=1190238173]
+shape = SubResource("RectangleShape2D_exit_l")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+position = Vector2(632, 180)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("RectangleShape2D_wall_r")
+
+[node name="Entities" type="Node2D" parent="." unique_id=1688050560]
+
+[node name="Enemies" type="Node2D" parent="Entities" unique_id=1743150874]
+
+[node name="Items" type="Node2D" parent="Entities" unique_id=466874439]
+
+[node name="Hazards" type="Node2D" parent="." unique_id=786997287]

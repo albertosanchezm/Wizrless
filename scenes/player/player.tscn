@@ -1,9 +1,37 @@
 [gd_scene format=3 uid="uid://bsm88x8isly8m"]
 
 [ext_resource type="Script" uid="uid://bamyi434uee3y" path="res://scripts/player/player.gd" id="1_player_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/player/idle.png" id="2_idle_tex"]
+[ext_resource type="Script" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_2d.gd" id="2_pcam2d"]
 [ext_resource type="Texture2D" uid="uid://b3o316r1ot8re" path="res://assets/sprites/player/player_idle_run_attack.png" id="3_gmlin"]
 [ext_resource type="Texture2D" uid="uid://bkjx0g7mmctia" path="res://assets/sprites/player/death_main.png" id="3_lvxji"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_atk0"]
+atlas = ExtResource("3_gmlin")
+region = Rect2(0, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_atk1"]
+atlas = ExtResource("3_gmlin")
+region = Rect2(64, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_atk2"]
+atlas = ExtResource("3_gmlin")
+region = Rect2(128, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_atk3"]
+atlas = ExtResource("3_gmlin")
+region = Rect2(192, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_atk4"]
+atlas = ExtResource("3_gmlin")
+region = Rect2(256, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_atk5"]
+atlas = ExtResource("3_gmlin")
+region = Rect2(320, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_atk6"]
+atlas = ExtResource("3_gmlin")
+region = Rect2(384, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_j4nxn"]
 atlas = ExtResource("3_lvxji")
@@ -125,34 +153,6 @@ region = Rect2(320, 0, 64, 64)
 atlas = ExtResource("3_gmlin")
 region = Rect2(384, 0, 64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_atk0"]
-atlas = ExtResource("3_gmlin")
-region = Rect2(0, 64, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_atk1"]
-atlas = ExtResource("3_gmlin")
-region = Rect2(64, 64, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_atk2"]
-atlas = ExtResource("3_gmlin")
-region = Rect2(128, 64, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_atk3"]
-atlas = ExtResource("3_gmlin")
-region = Rect2(192, 64, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_atk4"]
-atlas = ExtResource("3_gmlin")
-region = Rect2(256, 64, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_atk5"]
-atlas = ExtResource("3_gmlin")
-region = Rect2(320, 64, 64, 64)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_atk6"]
-atlas = ExtResource("3_gmlin")
-region = Rect2(384, 64, 64, 64)
-
 [sub_resource type="SpriteFrames" id="SpriteFrames_player"]
 animations = [{
 "frames": [{
@@ -181,10 +181,7 @@ animations = [{
 "name": &"attack",
 "speed": 8.0
 }, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("2_idle_tex")
-}],
+"frames": [],
 "loop": false,
 "name": &"dash",
 "speed": 8.0
@@ -316,9 +313,18 @@ script = ExtResource("1_player_script")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1772680081]
 position = Vector2(0, -32)
 sprite_frames = SubResource("SpriteFrames_player")
-animation = &"death"
+animation = &"attack"
 autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=520539011]
 position = Vector2(-1, -26)
 shape = SubResource("CapsuleShape2D_player")
+
+[node name="PhantomCamera2D" type="Node2D" parent="."]
+script = ExtResource("2_pcam2d")
+priority = 10
+follow_mode = 1
+limit_left = 0
+limit_top = 0
+limit_right = 640
+limit_bottom = 360

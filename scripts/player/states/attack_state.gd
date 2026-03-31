@@ -14,6 +14,8 @@ func _enter() -> void:
 	_p.velocity.x = 0.0
 	_p.anim.play("attack")
 	_fired = false
+	_p.attack_cooldown = _p.ATTACK_COOLDOWN
+	GameManager.attack_cooldown_changed.emit(_p.attack_cooldown, _p.ATTACK_COOLDOWN)
 
 
 func _update(_delta: float) -> void:

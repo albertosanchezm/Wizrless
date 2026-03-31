@@ -11,16 +11,18 @@ const FALL_GRAVITY   := 1400.0
 const MAX_FALL_SPEED := 500.0
 const COYOTE_TIME    := 0.12
 const JUMP_BUFFER    := 0.10
-const DASH_SPEED     := 220.0
-const DASH_DURATION  := 0.18
-const DASH_COOLDOWN  := 0.6
+const DASH_SPEED      := 220.0
+const DASH_DURATION   := 0.18
+const DASH_COOLDOWN   := 0.6
+const ATTACK_COOLDOWN := 1.5
 
 # ─── Estado compartido (escrito/leído por los estados) ───────────────────────
-var coyote_timer  := 0.0
-var jump_buffer   := 0.0
-var dash_cooldown := 0.0
-var jumps_left    := 0     # saltos extra disponibles (doble salto)
-var skip_gravity  := false # el estado Dash lo activa para anular la gravedad
+var coyote_timer   := 0.0
+var jump_buffer    := 0.0
+var dash_cooldown  := 0.0
+var attack_cooldown := 0.0
+var jumps_left     := 0     # saltos extra disponibles (doble salto)
+var skip_gravity   := false # el estado Dash lo activa para anular la gravedad
 
 # ─── Referencias ────────────────────────────────────────────────────────────
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
@@ -31,6 +33,9 @@ var _hsm: LimboHSM
 func _ready() -> void:
 	GameManager.player_died.connect(_on_player_died)
 	_setup_hsm()
+	var pcam := get_node_or_null("PhantomCamera2D")
+	if pcam:
+		pcam.set("follow_target", self)
 
 
 func _on_player_died() -> void:
@@ -116,6 +121,9 @@ func _apply_gravity(delta: float) -> void:
 
 func _tick_timers(delta: float) -> void:
 	dash_cooldown = max(0.0, dash_cooldown - delta)
+	if attack_cooldown > 0.0:
+		attack_cooldown = max(0.0, attack_cooldown - delta)
+		GameManager.attack_cooldown_changed.emit(attack_cooldown, ATTACK_COOLDOWN)
 	if not is_on_floor():
 		coyote_timer = max(0.0, coyote_timer - delta)
 
@@ -144,6 +152,10 @@ func reset_air_moves() -> void:
 func flip_toward(dir: float) -> void:
 	if dir != 0.0:
 		anim.flip_h = dir < 0.0
+
+
+func wants_attack() -> bool:
+	return Input.is_action_just_pressed("attack") and attack_cooldown <= 0.0
 
 
 func wants_dash() -> bool:
