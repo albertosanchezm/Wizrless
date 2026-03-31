@@ -30,6 +30,10 @@ func _update(_delta: float) -> void:
 		dispatch(&"dash")
 		return
 
+	if Input.is_action_just_pressed("attack"):
+		dispatch(&"attack")
+		return
+
 	# Comenzamos a caer
 	if _p.velocity.y >= 0.0:
 		dispatch(&"fall")

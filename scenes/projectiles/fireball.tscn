@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://fireball_main"]
+
+[ext_resource type="Script" path="res://scripts/projectiles/fireball.gd" id="1_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 6.0
+
+[node name="Fireball" type="Area2D"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_script")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(1, 0.5, 0.1, 1)
+
+[node name="Trail" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 8
+lifetime = 0.25
+fixed_fps = 30
+spread = 25.0
+initial_velocity_min = 20.0
+initial_velocity_max = 50.0
+gravity = Vector2(0, 0)
+color = Color(1, 0.5, 0.1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1")
+
+[node name="LifeTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+autostart = true

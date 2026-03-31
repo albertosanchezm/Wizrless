@@ -29,5 +29,9 @@ func _update(_delta: float) -> void:
 		dispatch(&"dash")
 		return
 
+	if Input.is_action_just_pressed("attack"):
+		dispatch(&"attack")
+		return
+
 	if abs(dir) < 0.1:
 		dispatch(&"stop")

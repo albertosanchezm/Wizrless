@@ -29,6 +29,10 @@ func _update(_delta: float) -> void:
 		dispatch(&"dash")
 		return
 
+	if Input.is_action_just_pressed("attack"):
+		dispatch(&"attack")
+		return
+
 	var dir := Input.get_axis("move_left", "move_right")
 	if abs(dir) > 0.1:
 		dispatch(&"move")

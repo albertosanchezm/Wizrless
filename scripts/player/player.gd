@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+const FIREBALL_SCENE := preload("res://scenes/projectiles/fireball.tscn")
+
 # ─── Constantes de física (leídas por los estados) ──────────────────────────
 const SPEED          := 90.0
 const JUMP_VELOCITY  := -260.0
@@ -151,6 +153,8 @@ func wants_dash() -> bool:
 
 
 func _on_attack_fired(pos: Vector2, dir: Vector2) -> void:
-	# Punto de extensión: instanciar proyectil, emitir señal al mundo, etc.
-	# Por ahora solo lo registramos para confirmar que la HSM lo llama.
-	print("attack_fired — pos: ", pos, " dir: ", dir)
+	var fb := FIREBALL_SCENE.instantiate()
+	fb.direction = dir
+	# Desplazar al pecho del personaje y por delante para no solapar el suelo
+	fb.global_position = pos + Vector2(dir.x * 16.0, -26.0)
+	get_parent().add_child(fb)
