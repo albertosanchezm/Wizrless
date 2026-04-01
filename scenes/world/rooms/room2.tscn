@@ -1,6 +1,7 @@
 [gd_scene format=4 uid="uid://c07mk5c7rxj33"]
 
 [ext_resource type="Script" uid="uid://b1mdmak1r6au4" path="res://scripts/world/room_exit.gd" id="1_exit_script"]
+[ext_resource type="PackedScene" uid="uid://6h045v6lrd03" path="res://scenes/enemies/devium.tscn" id="2_devium"]
 [ext_resource type="Texture2D" uid="uid://cq1wkvbm5yhry" path="res://assets/sprites/backgrounds/room2_arena_bg.png" id="1_oci0b"]
 [ext_resource type="Texture2D" uid="uid://cwcphhruw0j3b" path="res://assets/sprites/tilesets/temp_tileset.png" id="1_roip8"]
 
@@ -76,6 +77,9 @@ shape = SubResource("RectangleShape2D_wall_r")
 [node name="Entities" type="Node2D" parent="." unique_id=1688050560]
 
 [node name="Enemies" type="Node2D" parent="Entities" unique_id=1743150874]
+
+[node name="Devium" parent="Entities/Enemies" instance=ExtResource("2_devium")]
+position = Vector2(400, 300)
 
 [node name="Items" type="Node2D" parent="Entities" unique_id=466874439]
 

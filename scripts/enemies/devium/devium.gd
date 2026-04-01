@@ -15,8 +15,8 @@ var is_phase2: bool:
 var player: CharacterBody2D = null
 
 # ─── Referencias ──────────────────────────────────────────────────────────────
-@onready var anim: AnimationPlayer = $AnimationPlayer
-@onready var sprite: Sprite2D      = $Sprite2D
+@onready var anim: AnimationPlayer   = $AnimationPlayer
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: Area2D        = $Hitbox
 
 var _hsm: LimboHSM
@@ -86,6 +86,15 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 		take_damage(10)
 
 
+func die() -> void:
+	died.emit()
+
+
 func face_player() -> void:
 	if player:
 		sprite.flip_h = player.global_position.x < global_position.x
+
+
+func get_level() -> Node:
+	# Estructura esperada: Room/Entities/Enemies/Devium → 3 niveles arriba = Room root
+	return get_parent().get_parent().get_parent()

@@ -7,7 +7,7 @@ class_name Room
 
 func _ready() -> void:
 	var spawn := $SpawnPoints/PlayerSpawn as Marker2D
-	GameManager.set_respawn(spawn.global_position, room_id)
+	GameManager.set_respawn(spawn.global_position, room_id, get_scene_file_path())
 	_on_enter()
 
 

@@ -31,6 +31,7 @@ var _hsm: LimboHSM
 
 
 func _ready() -> void:
+	add_to_group(&"player")
 	GameManager.player_died.connect(_on_player_died)
 	_setup_hsm()
 	var pcam := get_node_or_null("PhantomCamera2D")

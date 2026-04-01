@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/projectiles/ice_rock.gd" id="1_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 10.0
+
+[node name="IceRock" type="Area2D"]
+collision_layer = 16
+collision_mask = 3
+script = ExtResource("1_script")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.7, 0.85, 1.0, 1)
+
+[node name="Shadow" type="Polygon2D" parent="."]
+color = Color(0.3, 0.5, 0.8, 0.45)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1")
+
+[node name="LifeTimer" type="Timer" parent="."]
+wait_time = 6.0
+one_shot = true
+autostart = true

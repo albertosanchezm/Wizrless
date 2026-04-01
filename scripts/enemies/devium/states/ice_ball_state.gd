@@ -1,12 +1,14 @@
 extends LimboState
 ## Lanza una bola de hielo en línea recta hacia el player.
 
+const ICE_BALL_SCENE := preload("res://scenes/projectiles/ice_ball.tscn")
+
 var _d: Devium
 var _timer   := 0.0
 var _fired   := false
 
-const WINDUP   := 0.6   # segundos de preparación antes de disparar
-const DURATION := 1.2   # duración total del estado
+const WINDUP   := 0.6
+const DURATION := 1.2
 
 
 func _setup() -> void:
@@ -18,7 +20,7 @@ func _enter() -> void:
 	_fired = false
 	_d.velocity = Vector2.ZERO
 	_d.face_player()
-	# TODO: reproducir animación ataque bola de hielo
+	_d.sprite.play(&"levitate_attack")
 
 
 func _update(delta: float) -> void:
@@ -36,10 +38,7 @@ func _fire() -> void:
 	if not _d.player:
 		return
 	var dir := (_d.player.global_position - _d.global_position).normalized()
-	# TODO: instanciar proyectil de bola de hielo
-	# Ejemplo:
-	# var proj = ICE_BALL_SCENE.instantiate()
-	# proj.global_position = _d.global_position
-	# proj.direction = dir
-	# _d.get_parent().add_child(proj)
-	pass
+	var ball: Area2D = ICE_BALL_SCENE.instantiate()
+	ball.direction        = dir
+	ball.global_position  = _d.global_position
+	_d.get_level().add_child(ball)

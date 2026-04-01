@@ -17,5 +17,5 @@ func _enter() -> void:
 
 func _die() -> void:
 	await _d.get_tree().create_timer(2.0).timeout
-	_d.died.emit()
+	_d.die()
 	_d.queue_free()

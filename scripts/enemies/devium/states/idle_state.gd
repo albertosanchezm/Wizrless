@@ -1,8 +1,8 @@
 extends LimboState
 
 var _d: Devium
-var _timer := 0.0
-const DURATION := 1.5
+
+const ACTIVATION_DISTANCE := 200.0
 
 
 func _setup() -> void:
@@ -10,11 +10,13 @@ func _setup() -> void:
 
 
 func _enter() -> void:
-	_timer = 0.0
-	# TODO: reproducir animación idle
+	_d.velocity = Vector2.ZERO
+	_d.sprite.play(&"idle")
 
 
-func _update(delta: float) -> void:
-	_timer += delta
-	if _timer >= DURATION:
+func _update(_delta: float) -> void:
+	if not _d.player:
+		return
+	var dist := _d.global_position.distance_to(_d.player.global_position)
+	if dist <= ACTIVATION_DISTANCE:
 		dispatch(&"levitate")

@@ -22,6 +22,7 @@ var current_health: int = 6
 
 # --- Posición de respawn ---
 var respawn_position: Vector2 = Vector2.ZERO
+var respawn_scene: String = ""
 var current_room: String = ""
 
 
@@ -48,9 +49,10 @@ func heal(amount: int) -> void:
 	health_changed.emit(current_health, max_health)
 
 
-func set_respawn(pos: Vector2, room: String) -> void:
+func set_respawn(pos: Vector2, room: String, scene: String = "") -> void:
 	respawn_position = pos
-	current_room = room
+	current_room     = room
+	respawn_scene    = scene
 
 
 func reset_health() -> void:
