@@ -1,14 +1,16 @@
 extends Area2D
 
-const SPEED        := 150.0
-const DAMAGE       := 5
+const SPEED := 150.0
+const DAMAGE := 5
+const ROTATION_SPEED_DEGREES := 306.0
 
 var direction := Vector2.RIGHT
-var _hit      := false
+var _hit := false
 
 
 func _ready() -> void:
-	($Visual as Polygon2D).polygon = PackedVector2Array([
+	var visual := $Visual as Polygon2D
+	visual.polygon = PackedVector2Array([
 		Vector2(0.0, -5.0), Vector2(4.0, 3.0), Vector2(-4.0, 3.0)
 	])
 
@@ -18,6 +20,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	position += direction * SPEED * delta
+	($Visual as Polygon2D).rotation_degrees += ROTATION_SPEED_DEGREES * delta
 
 
 func _on_body_entered(body: Node2D) -> void:

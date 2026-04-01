@@ -12,6 +12,7 @@ const BURN_WINDOW    := 2.5   # s — ventana para el segundo impacto que activa
 const BURN_DURATION  := 4.0   # s — duración total de la quemadura
 const BURN_TICK      := 0.8   # s — intervalo entre ticks de daño
 const BURN_DAMAGE    := 5     # HP por tick (5 ticks × 5 = 25 HP totales)
+const FIREBALL_DAMAGE := 10    # daño base por impacto directo de fireball
 
 var health: int = MAX_HEALTH
 var is_phase2: bool:
@@ -106,6 +107,7 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 	if area.is_in_group(&"player_hitbox"):
 		take_damage(10)
 	elif area.is_in_group(&"player_projectile"):
+		take_damage(FIREBALL_DAMAGE)
 		on_fire_hit()
 		area.queue_free()
 
