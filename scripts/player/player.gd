@@ -15,14 +15,20 @@ const DASH_SPEED      := 220.0
 const DASH_DURATION   := 0.18
 const DASH_COOLDOWN   := 0.6
 const ATTACK_COOLDOWN := 1.5
+const MAX_MANA         := 100.0
+const MANA_COST        := 25.0   # maná por disparo  → máx 4 disparos seguidos
+const MANA_REGEN_RATE  := 10.0   # puntos/s de recuperación
+const MANA_REGEN_DELAY := 1.5    # segundos sin disparar antes de empezar a regenerar
 
 # ─── Estado compartido (escrito/leído por los estados) ───────────────────────
-var coyote_timer   := 0.0
-var jump_buffer    := 0.0
-var dash_cooldown  := 0.0
+var coyote_timer    := 0.0
+var jump_buffer     := 0.0
+var dash_cooldown   := 0.0
 var attack_cooldown := 0.0
-var jumps_left     := 0     # saltos extra disponibles (doble salto)
-var skip_gravity   := false # el estado Dash lo activa para anular la gravedad
+var jumps_left      := 0      # saltos extra disponibles (doble salto)
+var skip_gravity    := false  # el estado Dash lo activa para anular la gravedad
+var current_mana    := MAX_MANA
+var _mana_regen_timer := 0.0  # cuenta atrás antes de empezar a regenerar
 
 # ─── Referencias ────────────────────────────────────────────────────────────
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
@@ -85,6 +91,7 @@ func _setup_hsm() -> void:
 	_hsm.add_transition(attack,        run,    &"move")
 	_hsm.add_transition(attack,        fall,   &"fall")
 	_hsm.add_transition(_hsm.ANYSTATE, death,  &"die")
+	_hsm.add_transition(death,         idle,   &"land")
 
 	_hsm.initial_state = idle
 	_hsm.initialize(self)
@@ -127,6 +134,12 @@ func _tick_timers(delta: float) -> void:
 		GameManager.attack_cooldown_changed.emit(attack_cooldown, ATTACK_COOLDOWN)
 	if not is_on_floor():
 		coyote_timer = max(0.0, coyote_timer - delta)
+	# Maná: espera MANA_REGEN_DELAY tras el último disparo, luego regenera
+	if _mana_regen_timer > 0.0:
+		_mana_regen_timer = maxf(0.0, _mana_regen_timer - delta)
+	elif current_mana < MAX_MANA:
+		current_mana = minf(MAX_MANA, current_mana + MANA_REGEN_RATE * delta)
+		GameManager.mana_changed.emit(current_mana, MAX_MANA)
 
 
 func _buffer_jump(delta: float) -> void:
@@ -156,7 +169,15 @@ func flip_toward(dir: float) -> void:
 
 
 func wants_attack() -> bool:
-	return Input.is_action_just_pressed("attack") and attack_cooldown <= 0.0
+	return Input.is_action_just_pressed("attack") \
+		and attack_cooldown <= 0.0 \
+		and current_mana >= MANA_COST
+
+
+func use_mana() -> void:
+	current_mana      = maxf(0.0, current_mana - MANA_COST)
+	_mana_regen_timer = MANA_REGEN_DELAY
+	GameManager.mana_changed.emit(current_mana, MAX_MANA)
 
 
 func wants_dash() -> bool:

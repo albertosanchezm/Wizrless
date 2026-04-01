@@ -5,8 +5,12 @@ extends Node
 
 signal ability_unlocked(ability_name: String)
 signal health_changed(current: int, maximum: int)
+signal mana_changed(current: float, maximum: float)
 signal player_died
 signal attack_cooldown_changed(remaining: float, total: float)
+signal boss_appeared(boss_name: String, max_health: int)
+signal boss_health_changed(current: int, maximum: int)
+signal boss_defeated()
 
 # --- Habilidades desbloqueables ---
 var abilities: Dictionary = {
@@ -17,8 +21,8 @@ var abilities: Dictionary = {
 }
 
 # --- Estado del jugador ---
-var max_health: int = 6
-var current_health: int = 6
+var max_health: int = 100
+var current_health: int = 100
 
 # --- Posición de respawn ---
 var respawn_position: Vector2 = Vector2.ZERO
@@ -38,10 +42,8 @@ func has_ability(ability_name: String) -> bool:
 
 
 func take_damage(amount: int) -> void:
-	current_health = max(0, current_health - amount)
+	current_health = max(1, current_health - amount)  # DEBUG: invulnerable
 	health_changed.emit(current_health, max_health)
-	if current_health == 0:
-		player_died.emit()
 
 
 func heal(amount: int) -> void:

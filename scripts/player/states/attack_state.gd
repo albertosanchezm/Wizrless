@@ -16,6 +16,7 @@ func _enter() -> void:
 	_fired = false
 	_p.attack_cooldown = _p.ATTACK_COOLDOWN
 	GameManager.attack_cooldown_changed.emit(_p.attack_cooldown, _p.ATTACK_COOLDOWN)
+	_p.use_mana()
 
 
 func _update(_delta: float) -> void:
@@ -35,5 +36,6 @@ func _update(_delta: float) -> void:
 
 
 func _fire() -> void:
-	var dir := Vector2(-1.0 if _p.anim.flip_h else 1.0, 0.0)
-	attack_fired.emit(_p.global_position, dir)
+	var x := -1.0 if _p.anim.flip_h else 1.0
+	var y := -1.0 if Input.is_action_pressed("move_up") else 0.0
+	attack_fired.emit(_p.global_position, Vector2(x, y).normalized())

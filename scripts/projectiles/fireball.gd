@@ -20,8 +20,10 @@ func _ready() -> void:
 	trail.color_ramp = _make_fire_gradient()
 	trail.emitting = true
 
+	add_to_group(&"player_projectile")
 	$LifeTimer.timeout.connect(queue_free)
 	body_entered.connect(_on_body_entered)
+	area_entered.connect(_on_area_entered)
 
 
 func _physics_process(delta: float) -> void:
@@ -30,6 +32,11 @@ func _physics_process(delta: float) -> void:
 
 func _on_body_entered(_body: Node2D) -> void:
 	queue_free()
+
+
+func _on_area_entered(area: Area2D) -> void:
+	if area.is_in_group(&"enemy_projectile"):
+		queue_free()
 
 
 func _make_fire_gradient() -> Gradient:

@@ -1,8 +1,8 @@
 extends Area2D
 
-const BASE_SPEED := 200.0
-const GRAVITY    := 400.0
-const DAMAGE     := 10
+const BASE_SPEED   := 200.0
+const GRAVITY      := 400.0
+const DAMAGE       := 10
 
 var direction := Vector2.RIGHT
 var _vel      := Vector2.ZERO
@@ -34,4 +34,5 @@ func _on_body_entered(body: Node2D) -> void:
 	_hit = true
 	if body.is_in_group(&"player"):
 		GameManager.take_damage(DAMAGE)
+		DamageNumber.spawn(get_parent(), DAMAGE, global_position, Color(1.0, 0.25, 0.25, 1.0))
 	queue_free()

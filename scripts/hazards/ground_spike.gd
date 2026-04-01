@@ -3,7 +3,7 @@ extends Area2D
 const APPEAR_TIME  := 0.15
 const ACTIVE_TIME  := 1.2
 const RETRACT_TIME := 0.15
-const DAMAGE       := 18
+const DAMAGE       := 20
 
 
 func _ready() -> void:
@@ -31,3 +31,4 @@ func _retract() -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group(&"player"):
 		GameManager.take_damage(DAMAGE)
+		DamageNumber.spawn(get_parent(), DAMAGE, body.global_position + Vector2(0.0, -20.0), Color(1.0, 0.25, 0.25, 1.0))
