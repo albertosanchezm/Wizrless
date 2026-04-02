@@ -4,7 +4,9 @@
       "Bash(python3 -c \":*)",
       "Bash(python -c \":*)",
       "Bash(node -e \":*)",
-      "Bash(find /c/Users/alber/Desktop/Wizrless/addons -name *.gd)"
+      "Bash(find /c/Users/alber/Desktop/Wizrless/addons -name *.gd)",
+      "Bash(node -e ':*)",
+      "Bash(powershell -Command ':*)"
     ]
   }
 }

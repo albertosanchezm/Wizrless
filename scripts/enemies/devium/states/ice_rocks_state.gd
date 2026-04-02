@@ -7,13 +7,13 @@ var _d: Devium
 var _timer        := 0.0
 var _volley_timer := 0.0
 var _volleys_done := 0
+var _floor_y      := 0.0
 
 const WINDUP           := 0.5
 const VOLLEY_INTERVAL  := 0.5
 const NUM_VOLLEYS      := 3
 const ROCKS_PER_VOLLEY := 2
 const SPAWN_Y          := 35.0   # justo encima del techo del room
-const FLOOR_Y          := 352.0  # superficie del suelo para la sombra
 const ROOM_LEFT        := 48.0
 const ROOM_RIGHT       := 592.0
 
@@ -26,9 +26,10 @@ func _enter() -> void:
 	_timer        = 0.0
 	_volley_timer = 0.0
 	_volleys_done = 0
+	_floor_y    = _detect_floor_y()
 	_d.velocity = Vector2.ZERO
 	_d.face_player()
-	_d.sprite.play(&"levitate_attack2")
+	_d.sprite.play(&"levitate_phase2_attack" if _d.is_phase2 else &"levitate_attack2")
 
 
 func _update(delta: float) -> void:
@@ -47,6 +48,18 @@ func _update(delta: float) -> void:
 		dispatch(&"end_attack")
 
 
+func _detect_floor_y() -> float:
+	var space := _d.get_world_2d().direct_space_state
+	var query := PhysicsRayQueryParameters2D.create(
+		Vector2(_d.global_position.x, 0.0),
+		Vector2(_d.global_position.x, 800.0),
+		1
+	)
+	query.exclude = [_d.get_rid()]
+	var result := space.intersect_ray(query)
+	return result.position.y + 16.0 if result else 350.0
+
+
 func _launch_volley() -> void:
 	if not _d.player:
 		return
@@ -54,6 +67,6 @@ func _launch_volley() -> void:
 		var offset_x := randf_range(-80.0, 80.0)
 		var target_x := clampf(_d.player.global_position.x + offset_x, ROOM_LEFT, ROOM_RIGHT)
 		var rock: Area2D = ICE_ROCK_SCENE.instantiate()
-		rock.floor_y          = FLOOR_Y
+		rock.floor_y          = _floor_y
 		rock.global_position  = Vector2(target_x, SPAWN_Y)
 		_d.get_level().add_child(rock)

@@ -1,18 +1,20 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/hazards/ground_spike.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/hazzards/spike_ice.png" id="2_spike_texture"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
-size = Vector2(14.0, 32.0)
+size = Vector2(18.0, 46.0)
 
 [node name="GroundSpike" type="Area2D"]
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("1_script")
 
-[node name="Visual" type="Polygon2D" parent="."]
-color = Color(0.7, 0.9, 1.0, 1)
+[node name="Visual" type="Sprite2D" parent="."]
+position = Vector2(0.0, -26.5)
+texture = ExtResource("2_spike_texture")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0.0, -17.0)
+position = Vector2(0.0, -23.0)
 shape = SubResource("RectangleShape2D_1")

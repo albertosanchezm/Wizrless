@@ -32,6 +32,9 @@ var _mana_regen_timer := 0.0  # cuenta atrás antes de empezar a regenerar
 
 # ─── Referencias ────────────────────────────────────────────────────────────
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
+@onready var step_sfx: AudioStreamPlayer   = $StepSFX
+@onready var damage_sfx: AudioStreamPlayer = $DamageSFX
+@onready var jump_sfx: AudioStreamPlayer   = $JumpSFX
 
 var _hsm: LimboHSM
 
@@ -39,6 +42,7 @@ var _hsm: LimboHSM
 func _ready() -> void:
 	add_to_group(&"player")
 	GameManager.player_died.connect(_on_player_died)
+	GameManager.player_took_damage.connect(func() -> void: damage_sfx.play())
 	_setup_hsm()
 	var pcam := get_node_or_null("PhantomCamera2D")
 	if pcam:

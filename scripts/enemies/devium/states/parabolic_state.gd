@@ -39,7 +39,7 @@ func _update(delta: float) -> void:
 func _fire() -> void:
 	if not _d.player:
 		return
-	var base_dir  := (_d.player.global_position - _d.global_position).normalized()
+	var base_dir  := Vector2.UP
 	var half_arc  := deg_to_rad(ARC_DEGREES / 2.0)
 	var step      := deg_to_rad(ARC_DEGREES) / max(NUM_BALLS - 1, 1)
 

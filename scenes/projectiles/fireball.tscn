@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://fireball_main"]
 
 [ext_resource type="Script" path="res://scripts/projectiles/fireball.gd" id="1_script"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/fireball.wav" id="2_sfx"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 6.0
@@ -31,3 +32,6 @@ shape = SubResource("CircleShape2D_1")
 wait_time = 3.0
 one_shot = true
 autostart = true
+
+[node name="SFX" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_sfx")

@@ -14,6 +14,7 @@ func _enter() -> void:
 	_p.coyote_timer = 0.0
 	_cut_applied   = false
 	_p.anim.play("jump")
+	_p.jump_sfx.play()
 
 
 func _update(_delta: float) -> void:

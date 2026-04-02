@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="GameFontConfig" format=3]
+
+[ext_resource type="Script" path="res://scripts/config/game_font_config.gd" id="1_font_config_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/Quinget-MediumCondensed-BF69ce32b8e3f87.otf" id="2_quinget_font"]
+
+[resource]
+script = ExtResource("1_font_config_script")
+ui_font = ExtResource("2_quinget_font")
+title_font = ExtResource("2_quinget_font")
+monospace_font = ExtResource("2_quinget_font")
+ui_small_size = 8
+ui_medium_size = 12
+ui_large_size = 16
+title_size = 20
+damage_number_size = 14

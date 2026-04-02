@@ -1,7 +1,16 @@
 extends LimboState
-## Lanza una bola de hielo en línea recta hacia el player.
+## Fase 1: disparo parabólico dirigido a la posición del player.
+## Fase 2: disparo recto.
 
-const ICE_BALL_SCENE := preload("res://scenes/projectiles/ice_ball.tscn")
+const ICE_BALL_SCENE      := preload("res://scenes/projectiles/ice_ball.tscn")
+const PARABOLIC_BALL_SCENE := preload("res://scenes/projectiles/parabolic_ball.tscn")
+
+# Deben coincidir con los valores de parabolic_ball.gd
+const PB_GRAVITY    := 400.0
+const PB_BASE_SPEED := 200.0
+# Velocidad horizontal fija que determina la apertura del arco
+const PB_H_SPEED    := 130.0   # px/s — subir = arco más cerrado, bajar = más abierto
+const PB_MIN_TIME   := 0.5     # s  — tiempo de vuelo mínimo (evita ángulos extremos)
 
 var _d: Devium
 var _timer   := 0.0
@@ -20,7 +29,7 @@ func _enter() -> void:
 	_fired = false
 	_d.velocity = Vector2.ZERO
 	_d.face_player()
-	_d.sprite.play(&"levitate_attack")
+	_d.sprite.play(&"levitate_phase2_attack" if _d.is_phase2 else &"levitate_attack")
 
 
 func _update(delta: float) -> void:
@@ -37,8 +46,32 @@ func _update(delta: float) -> void:
 func _fire() -> void:
 	if not _d.player:
 		return
+	if _d.is_phase2:
+		_fire_straight()
+	else:
+		_fire_parabolic()
+
+
+func _fire_straight() -> void:
 	var dir := (_d.player.global_position - _d.global_position).normalized()
 	var ball: Area2D = ICE_BALL_SCENE.instantiate()
-	ball.direction        = dir
-	ball.global_position  = _d.global_position
+	ball.direction       = dir
+	ball.global_position = _d.global_position
+	_d.get_level().add_child(ball)
+
+
+func _fire_parabolic() -> void:
+	var origin := _d.global_position
+	var target := _d.player.global_position
+	var dx     := target.x - origin.x
+	var dy     := target.y - origin.y
+
+	# Tiempo de vuelo: basado en la distancia horizontal, con mínimo para evitar arcos bruscos
+	var T  := maxf(absf(dx) / PB_H_SPEED, PB_MIN_TIME)
+	var vx := dx / T
+	var vy := (dy - 0.5 * PB_GRAVITY * T * T) / T
+
+	var ball: Area2D = PARABOLIC_BALL_SCENE.instantiate()
+	ball.direction       = Vector2(vx, vy) / PB_BASE_SPEED
+	ball.global_position = origin
 	_d.get_level().add_child(ball)

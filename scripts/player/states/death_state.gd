@@ -11,6 +11,7 @@ func _enter() -> void:
 	_p.velocity     = Vector2.ZERO
 	_p.skip_gravity = true
 	_p.set_physics_process(false)
+	GameManager.player_died.emit()
 	_p.anim.play("death")
 	_p.anim.animation_finished.connect(_on_death_finished, CONNECT_ONE_SHOT)
 

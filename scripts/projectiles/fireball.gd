@@ -21,6 +21,7 @@ func _ready() -> void:
 	trail.emitting = true
 
 	add_to_group(&"player_projectile")
+	$SFX.play()
 	$LifeTimer.timeout.connect(queue_free)
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)

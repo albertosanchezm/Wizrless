@@ -18,6 +18,8 @@ var health: int = MAX_HEALTH
 var is_phase2: bool:
 	get: return health <= MAX_HEALTH * PHASE2_THRESHOLD
 
+var _phase2_triggered := false
+
 # ─── Estado de quemadura ─────────────────────────────────────────────────────
 const BURN_INDICATOR_SCENE := preload("res://scenes/effects/burn_indicator.tscn")
 
@@ -53,28 +55,31 @@ func _setup_hsm() -> void:
 	_hsm.set_physics_process(false)
 	add_child(_hsm)
 
-	var idle          := _make_state("res://scripts/enemies/devium/states/idle_state.gd",          "IdleState")
-	var levitate      := _make_state("res://scripts/enemies/devium/states/levitate_state.gd",      "LevitateState")
-	var ice_ball      := _make_state("res://scripts/enemies/devium/states/ice_ball_state.gd",      "IceBallState")
-	var ground_spikes := _make_state("res://scripts/enemies/devium/states/ground_spikes_state.gd", "GroundSpikesState")
-	var parabolic     := _make_state("res://scripts/enemies/devium/states/parabolic_state.gd",     "ParabolicState")
-	var ice_rocks     := _make_state("res://scripts/enemies/devium/states/ice_rocks_state.gd",     "IceRocksState")
-	var death         := _make_state("res://scripts/enemies/devium/states/death_state.gd",         "DeathState")
+	var idle             := _make_state("res://scripts/enemies/devium/states/idle_state.gd",             "IdleState")
+	var levitate         := _make_state("res://scripts/enemies/devium/states/levitate_state.gd",         "LevitateState")
+	var ice_ball         := _make_state("res://scripts/enemies/devium/states/ice_ball_state.gd",         "IceBallState")
+	var ground_spikes    := _make_state("res://scripts/enemies/devium/states/ground_spikes_state.gd",    "GroundSpikesState")
+	var parabolic        := _make_state("res://scripts/enemies/devium/states/parabolic_state.gd",        "ParabolicState")
+	var ice_rocks        := _make_state("res://scripts/enemies/devium/states/ice_rocks_state.gd",        "IceRocksState")
+	var phase2_transition := _make_state("res://scripts/enemies/devium/states/phase2_transition_state.gd", "Phase2TransitionState")
+	var death            := _make_state("res://scripts/enemies/devium/states/death_state.gd",            "DeathState")
 
-	for s in [idle, levitate, ice_ball, ground_spikes, parabolic, ice_rocks, death]:
+	for s in [idle, levitate, ice_ball, ground_spikes, parabolic, ice_rocks, phase2_transition, death]:
 		_hsm.add_child(s)
 
 	# Transiciones
-	_hsm.add_transition(idle,          levitate,      &"levitate")
-	_hsm.add_transition(levitate,      ice_ball,      &"atk_ice_ball")
-	_hsm.add_transition(levitate,      ice_rocks,     &"atk_ice_rocks")
-	_hsm.add_transition(levitate,      ground_spikes, &"atk_ground_spikes")
-	_hsm.add_transition(levitate,      parabolic,     &"atk_parabolic")
-	_hsm.add_transition(ice_ball,      levitate,      &"end_attack")
-	_hsm.add_transition(ice_rocks,     levitate,      &"end_attack")
-	_hsm.add_transition(ground_spikes, levitate,      &"end_attack")
-	_hsm.add_transition(parabolic,     levitate,      &"end_attack")
-	_hsm.add_transition(_hsm.ANYSTATE, death,         &"die")
+	_hsm.add_transition(idle,              levitate,          &"levitate")
+	_hsm.add_transition(levitate,          ice_ball,          &"atk_ice_ball")
+	_hsm.add_transition(levitate,          ice_rocks,         &"atk_ice_rocks")
+	_hsm.add_transition(levitate,          ground_spikes,     &"atk_ground_spikes")
+	_hsm.add_transition(levitate,          parabolic,         &"atk_parabolic")
+	_hsm.add_transition(ice_ball,          levitate,          &"end_attack")
+	_hsm.add_transition(ice_rocks,         levitate,          &"end_attack")
+	_hsm.add_transition(ground_spikes,     levitate,          &"end_attack")
+	_hsm.add_transition(parabolic,         levitate,          &"end_attack")
+	_hsm.add_transition(_hsm.ANYSTATE,     phase2_transition, &"phase2_start")
+	_hsm.add_transition(phase2_transition, levitate,          &"end_transition")
+	_hsm.add_transition(_hsm.ANYSTATE,     death,             &"die")
 
 	_hsm.initial_state = idle
 	_hsm.initialize(self)
@@ -99,7 +104,10 @@ func take_damage(amount: int, color: Color = Color.WHITE) -> void:
 	health = max(0, health - amount)
 	DamageNumber.spawn(get_level(), amount, global_position + Vector2(randf_range(-12.0, 12.0), -40.0), color)
 	GameManager.boss_health_changed.emit(health, MAX_HEALTH)
-	if health == 0:
+	if is_phase2 and not _phase2_triggered:
+		_phase2_triggered = true
+		_hsm.dispatch(&"phase2_start")
+	elif health == 0:
 		_hsm.dispatch(&"die")
 
 
@@ -173,3 +181,17 @@ func face_player() -> void:
 func get_level() -> Node:
 	# Estructura esperada: Room/Entities/Enemies/Devium → 3 niveles arriba = Room root
 	return get_parent().get_parent().get_parent()
+
+
+func get_floor_y(default_y: float = global_position.y) -> float:
+	var level := get_level()
+	if level is Room:
+		return level.get_floor_y(default_y)
+	return default_y
+
+
+func get_floor_y_at(global_x: float, default_y: float = global_position.y) -> float:
+	var level := get_level()
+	if level is Room:
+		return level.get_floor_y_at(global_x, default_y)
+	return default_y

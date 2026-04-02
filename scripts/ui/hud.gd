@@ -2,10 +2,8 @@ extends CanvasLayer
 
 var _ability_labels: Dictionary = {}
 
-@onready var _health_bar:      ProgressBar = $Control/TopLeft/HealthBar
-@onready var _health_value:    Label       = $Control/TopLeft/HealthValue
-@onready var _mana_bar:        ProgressBar = $Control/TopLeft/ManaBar
-@onready var _mana_value:      Label       = $Control/TopLeft/ManaValue
+@onready var _health_bar:      ProgressBar = $Control/TopLeft/HealthRow/HealthBar
+@onready var _mana_bar:        ProgressBar = $Control/TopLeft/ManaRow/ManaBar
 @onready var _cooldown_bar:    ProgressBar = $Control/TopRight/CooldownBar
 @onready var _cooldown_label:  Label       = $Control/TopRight/CooldownLabel
 @onready var _boss_container:  VBoxContainer = $Control/BossContainer
@@ -33,13 +31,11 @@ func _ready() -> void:
 func _on_health_changed(current: int, maximum: int) -> void:
 	_health_bar.max_value = maximum
 	_health_bar.value     = current
-	_health_value.text    = "%d / %d" % [current, maximum]
 
 
 func _on_mana_changed(current: float, maximum: float) -> void:
 	_mana_bar.max_value = maximum
 	_mana_bar.value     = current
-	_mana_value.text    = "%d / %d" % [int(current), int(maximum)]
 
 
 func _on_ability_unlocked(ability_name: String) -> void:
