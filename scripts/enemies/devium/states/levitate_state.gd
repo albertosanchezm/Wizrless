@@ -158,9 +158,11 @@ func _phase2_orbit(delta: float) -> void:
 		if _inside_room(next_pos):
 			_d.velocity = retreat_dir * P2_RETREAT_SPEED
 		else:
-			# Sin espacio: cambiar de lado volteando el ángulo
+			# Sin espacio: moverse hacia el centro del room
+			var room_center := Vector2((ROOM_LEFT + ROOM_RIGHT) * 0.5, (ROOM_TOP + ROOM_BOTTOM) * 0.5)
+			var to_center   := (room_center - _d.global_position).normalized()
+			_d.velocity = to_center * P2_RETREAT_SPEED
 			_p2_angle += PI
-			_d.velocity = Vector2.ZERO
 		return
 
 	# Órbita helicoidal: ángulo avanza y radio respira

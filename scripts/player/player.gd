@@ -4,7 +4,7 @@ const FIREBALL_SCENE := preload("res://scenes/projectiles/fireball.tscn")
 
 # ─── Constantes de física (leídas por los estados) ──────────────────────────
 const SPEED          := 90.0
-const JUMP_VELOCITY  := -260.0
+const JUMP_VELOCITY  := -325.0
 const JUMP_CUT       := 0.4
 const GRAVITY        := 900.0
 const FALL_GRAVITY   := 1400.0

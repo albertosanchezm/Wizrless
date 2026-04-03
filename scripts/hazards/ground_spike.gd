@@ -5,22 +5,32 @@ var active_time  := 1.2
 var retract_time := 0.15
 const DAMAGE := 20
 
+# Altura total de la sprite (centro en y=-26.5, extiende 26.5px arriba y abajo)
+const SPRITE_HEIGHT := 53.0
+
 
 func _ready() -> void:
-	# El pivot es la base (y=0 = nivel del suelo); crece hacia arriba
-	scale.y = 0.0
+	# Empieza con la punta justo a ras del suelo (top de sprite en y=0 local)
+	var visual := $Visual as Sprite2D
+	var normal_y := visual.position.y                    # -26.5
+	var start_y  := normal_y + SPRITE_HEIGHT * 0.5       # punta al ras del suelo
+
+	visual.position.y = start_y
+
 	body_entered.connect(_on_body_entered)
 
 	var tween := create_tween()
-	tween.tween_property(self, "scale:y", 1.0, appear_time)
+	tween.tween_property(visual, "position:y", normal_y, appear_time).set_ease(Tween.EASE_OUT)
 	tween.tween_interval(active_time)
 	tween.tween_callback(_retract)
 
 
 func _retract() -> void:
 	$CollisionShape2D.set_deferred(&"disabled", true)
-	var tween := create_tween()
-	tween.tween_property(self, "scale:y", 0.0, retract_time)
+	var visual  := $Visual as Sprite2D
+	var start_y := visual.position.y + SPRITE_HEIGHT * 0.5
+	var tween   := create_tween()
+	tween.tween_property(visual, "position:y", start_y, retract_time).set_ease(Tween.EASE_IN)
 	tween.tween_callback(queue_free)
 
 

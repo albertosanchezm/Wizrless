@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c4m6f6xprhs0y" path="res://scripts/enemies/devium/devium.gd" id="1_devium_script"]
 [ext_resource type="Texture2D" uid="uid://tnhsgebajht0" path="res://assets/sprites/bosses/boss_devium.png" id="2_ujhfi"]
+[ext_resource type="Script" path="res://scripts/effects/phase2_waves.gd" id="3_phase2_waves"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ujhfi"]
 atlas = ExtResource("2_ujhfi")
@@ -290,6 +291,12 @@ height = 48.0
 [node name="Devium" type="CharacterBody2D" unique_id=2125443999]
 collision_layer = 4
 script = ExtResource("1_devium_script")
+
+[node name="Phase2Waves" type="Node2D" parent="." unique_id=459203617]
+visible = false
+z_index = 2
+position = Vector2(0, -2)
+script = ExtResource("3_phase2_waves")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1332702035]
 sprite_frames = SubResource("SpriteFrames_578nf")
