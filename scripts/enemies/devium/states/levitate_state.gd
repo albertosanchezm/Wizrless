@@ -49,6 +49,7 @@ const P2_BREATH_AMP    := 40.0    # px   — amplitud del radio respirante
 const P2_BREATH_FREQ   := 0.45    # rad/s
 const P2_MOVE_SPEED    := 170.0   # px/s — velocidad hacia el ancla
 const P2_DANGER_DIST   := 200.0   # px   — umbral para retroceder
+const P2_SAFE_DIST     := 260.0   # px   — umbral para dejar de retroceder (histéresis)
 const P2_RETREAT_SPEED := 250.0   # px/s
 const P2_WALL_MARGIN   := 28.0    # px   — margen para detectar esquina sin espacio
 
@@ -59,6 +60,7 @@ var _last_attack: StringName = &""
 var _player_last_pos := Vector2.ZERO
 var _still_time      := 0.0
 var _p2_angle        := 0.0
+var _retreating      := false
 
 
 func _setup() -> void:
@@ -71,6 +73,7 @@ func _enter() -> void:
 	_still_time   = 0.0
 	_orbit_center = _d.player.global_position if _d.player else _d.global_position
 	_player_last_pos = _orbit_center
+	_retreating = false
 	# Inicializar ángulo desde la posición actual para evitar salto brusco
 	if _d.player:
 		var offset := _d.global_position - _d.player.global_position
@@ -152,13 +155,18 @@ func _phase2_orbit(delta: float) -> void:
 	var to_player  := player_pos - _d.global_position
 	var dist       := to_player.length()
 
+	# Histéresis: entra en retirada a <200px, sale a >260px
 	if dist < P2_DANGER_DIST:
+		_retreating = true
+	elif dist > P2_SAFE_DIST:
+		_retreating = false
+
+	if _retreating:
 		var retreat_dir := -to_player.normalized()
 		var next_pos    := _d.global_position + retreat_dir * P2_RETREAT_SPEED * delta
 		if _inside_room(next_pos):
 			_d.velocity = retreat_dir * P2_RETREAT_SPEED
 		else:
-			# Sin espacio: moverse hacia el centro del room
 			var room_center := Vector2((ROOM_LEFT + ROOM_RIGHT) * 0.5, (ROOM_TOP + ROOM_BOTTOM) * 0.5)
 			var to_center   := (room_center - _d.global_position).normalized()
 			_d.velocity = to_center * P2_RETREAT_SPEED

@@ -14,6 +14,7 @@ const FIREBALL_DAMAGE := 10
 const INTRO_DIALOGUE_TEXT := "~ start\nDevium: Hola \"amigo\"\n=> END"
 
 const BURN_INDICATOR_SCENE := preload("res://scenes/effects/burn_indicator.tscn")
+const DIALOGUE_MANAGER_SCRIPT := preload("res://addons/dialogue_manager/dialogue_manager.gd")
 
 var health: int = MAX_HEALTH
 var is_phase2: bool:
@@ -28,6 +29,7 @@ var _burn_tick_timer := 0.0
 var _burn_indicator: Node2D = null
 var _intro_started := false
 var _combat_started := false
+var _dialogue_manager: Node = null
 
 var player: CharacterBody2D = null
 
@@ -215,8 +217,8 @@ func start_intro_sequence() -> void:
 func _play_intro_sequence() -> void:
 	sprite.play(&"idle")
 
-	if Engine.has_singleton("DialogueManager"):
-		var dialogue_manager = Engine.get_singleton("DialogueManager")
+	var dialogue_manager := _get_dialogue_manager()
+	if dialogue_manager != null:
 		var resource = dialogue_manager.create_resource_from_text(INTRO_DIALOGUE_TEXT)
 		if resource != null:
 			var balloon = dialogue_manager.show_dialogue_balloon(resource)
@@ -232,3 +234,16 @@ func _start_combat() -> void:
 	_combat_started = true
 	GameManager.boss_appeared.emit("Devium", MAX_HEALTH)
 	_hsm.dispatch(&"levitate")
+
+
+func _get_dialogue_manager() -> Node:
+	if is_instance_valid(_dialogue_manager):
+		return _dialogue_manager
+
+	if Engine.has_singleton("DialogueManager"):
+		_dialogue_manager = Engine.get_singleton("DialogueManager") as Node
+		return _dialogue_manager
+
+	_dialogue_manager = DIALOGUE_MANAGER_SCRIPT.new()
+	get_tree().root.add_child(_dialogue_manager)
+	return _dialogue_manager

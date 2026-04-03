@@ -31,11 +31,13 @@ const P2_BREATH_AMP    := 40.0
 const P2_BREATH_FREQ   := 0.45
 const P2_MOVE_SPEED    := 170.0
 const P2_DANGER_DIST   := 200.0
+const P2_SAFE_DIST     := 260.0   # distancia para dejar de retroceder (histéresis)
 const P2_RETREAT_SPEED := 250.0
 const P2_WALL_MARGIN   := 28.0
 
-var _time     := 0.0
-var _p2_angle := 0.0
+var _time       := 0.0
+var _p2_angle   := 0.0
+var _retreating := false
 
 
 func _setup() -> void:
@@ -51,7 +53,8 @@ func _enter() -> void:
 	_d.sprite.play(&"levitate_phase2_attack")
 	_build_positions()
 	_start_shake()
-	_time = 0.0
+	_time       = 0.0
+	_retreating = false
 	if _d.player:
 		var offset := _d.global_position - _d.player.global_position
 		_p2_angle = atan2(offset.y, offset.x)
@@ -92,13 +95,18 @@ func _move(delta: float) -> void:
 	var to_player  := player_pos - _d.global_position
 	var dist       := to_player.length()
 
+	# Histéresis: entra en retirada a <200px, sale a >260px
 	if dist < P2_DANGER_DIST:
+		_retreating = true
+	elif dist > P2_SAFE_DIST:
+		_retreating = false
+
+	if _retreating:
 		var retreat_dir := -to_player.normalized()
 		var next_pos    := _d.global_position + retreat_dir * P2_RETREAT_SPEED * delta
 		if _inside_room(next_pos):
 			_d.velocity = retreat_dir * P2_RETREAT_SPEED
 		else:
-			# Sin espacio: moverse hacia el centro del room
 			var room_center := Vector2((ROOM_LEFT + ROOM_RIGHT) * 0.5, (ROOM_TOP + ROOM_BOTTOM) * 0.5)
 			var to_center   := (room_center - _d.global_position).normalized()
 			_d.velocity = to_center * P2_RETREAT_SPEED

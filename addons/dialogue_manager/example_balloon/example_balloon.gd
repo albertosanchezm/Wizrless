@@ -60,6 +60,7 @@ var mutation_cooldown: Timer = Timer.new()
 
 ## The label showing the name of the currently speaking character
 @onready var character_label: RichTextLabel = %CharacterLabel
+@onready var portrait: TextureRect = %Portrait
 
 ## The label showing the currently spoken dialogue
 @onready var dialogue_label: DialogueLabel = %DialogueLabel
@@ -132,6 +133,7 @@ func apply_dialogue_line() -> void:
 
 	character_label.visible = not dialogue_line.character.is_empty()
 	character_label.text = tr(dialogue_line.character, "dialogue")
+	portrait.visible = dialogue_line.character.to_lower() == "devium"
 
 	dialogue_label.hide()
 	dialogue_label.dialogue_line = dialogue_line
