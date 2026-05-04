@@ -29,10 +29,10 @@ const P2_ANGULAR_SPEED := 1.3
 const P2_TARGET_RADIUS := 150.0
 const P2_BREATH_AMP    := 40.0
 const P2_BREATH_FREQ   := 0.45
-const P2_MOVE_SPEED    := 170.0
+const P2_MOVE_SPEED    := 127.5
 const P2_DANGER_DIST   := 200.0
 const P2_SAFE_DIST     := 260.0   # distancia para dejar de retroceder (histéresis)
-const P2_RETREAT_SPEED := 250.0
+const P2_RETREAT_SPEED := 187.5
 const P2_WALL_MARGIN   := 28.0
 
 var _time       := 0.0

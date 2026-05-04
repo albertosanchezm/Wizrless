@@ -47,10 +47,10 @@ const P2_ANGULAR_SPEED := 1.3     # rad/s — velocidad de rotación
 const P2_TARGET_RADIUS := 150.0   # px   — distancia ideal al player
 const P2_BREATH_AMP    := 40.0    # px   — amplitud del radio respirante
 const P2_BREATH_FREQ   := 0.45    # rad/s
-const P2_MOVE_SPEED    := 170.0   # px/s — velocidad hacia el ancla
+const P2_MOVE_SPEED    := 127.5   # px/s — velocidad hacia el ancla (25% menos)
 const P2_DANGER_DIST   := 200.0   # px   — umbral para retroceder
 const P2_SAFE_DIST     := 260.0   # px   — umbral para dejar de retroceder (histéresis)
-const P2_RETREAT_SPEED := 250.0   # px/s
+const P2_RETREAT_SPEED := 187.5   # px/s (25% menos)
 const P2_WALL_MARGIN   := 28.0    # px   — margen para detectar esquina sin espacio
 
 var _time            := 0.0
