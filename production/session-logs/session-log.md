@@ -1919,3 +1919,338 @@ scripts/enemies/devium/states/ground_spikes_state.gd
 scripts/enemies/devium/states/levitate_state.gd
 ---
 
+## Archived Session State: 20260505_195829
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-04
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓
+- **Progress**: 19 / 22 MVP systems designed
+- **Next**: Spell VFX System (design/gdd/spell-vfx-system.md — not yet created)
+- **Queue remaining**: Spell VFX → Audio Feedback → Boss Dialogue UI
+---
+
+## Session End: 20260505_195829
+### Uncommitted Changes
+.claude/settings.local.json
+---
+
+## Archived Session State: 20260505_195942
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-04
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓
+- **Progress**: 19 / 22 MVP systems designed
+- **Next**: Spell VFX System (design/gdd/spell-vfx-system.md — not yet created)
+- **Queue remaining**: Spell VFX → Audio Feedback → Boss Dialogue UI
+---
+
+## Session End: 20260505_195942
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+production/session-logs/session-log.md
+---
+
+## Archived Session State: 20260505_200103
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-04
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓
+- **Progress**: 19 / 22 MVP systems designed
+- **Next**: Spell VFX System (design/gdd/spell-vfx-system.md — not yet created)
+- **Queue remaining**: Spell VFX → Audio Feedback → Boss Dialogue UI
+---
+
+## Session End: 20260505_200103
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+production/session-logs/session-log.md
+---
+
+## Archived Session State: 20260505_200219
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-04
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓
+- **Progress**: 19 / 22 MVP systems designed
+- **Next**: Spell VFX System (design/gdd/spell-vfx-system.md — not yet created)
+- **Queue remaining**: Spell VFX → Audio Feedback → Boss Dialogue UI
+---
+
+## Session End: 20260505_200219
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+production/session-logs/session-log.md
+---
+
+## Archived Session State: 20260505_200349
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-04
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓
+- **Progress**: 19 / 22 MVP systems designed
+- **Next**: Spell VFX System (design/gdd/spell-vfx-system.md — not yet created)
+- **Queue remaining**: Spell VFX → Audio Feedback → Boss Dialogue UI
+---
+
+## Session End: 20260505_200349
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+production/session-logs/session-log.md
+---
+
+## Archived Session State: 20260505_200509
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-04
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓
+- **Progress**: 19 / 22 MVP systems designed
+- **Next**: Spell VFX System (design/gdd/spell-vfx-system.md — not yet created)
+- **Queue remaining**: Spell VFX → Audio Feedback → Boss Dialogue UI
+---
+
+## Session End: 20260505_200509
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+production/session-logs/session-log.md
+---
+
+## Archived Session State: 20260505_200618
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-04
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓ | Spell VFX System ✓
+- **Progress**: 20 / 22 MVP systems designed
+- **Next**: Audio Feedback System (design/gdd/audio-feedback-system.md — not yet created)
+- **Queue remaining**: Audio Feedback → Boss Dialogue UI
+---
+
+## Session End: 20260505_200618
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+design/gdd/systems-index.md
+production/session-logs/session-log.md
+production/session-state/active.md
+---
+
+## Archived Session State: 20260505_200826
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-04
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓ | Spell VFX System ✓
+- **Progress**: 20 / 22 MVP systems designed
+- **Next**: Audio Feedback System (design/gdd/audio-feedback-system.md — not yet created)
+- **Queue remaining**: Audio Feedback → Boss Dialogue UI
+---
+
+## Session End: 20260505_200826
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+design/gdd/systems-index.md
+production/session-logs/session-log.md
+production/session-state/active.md
+---
+
+## Archived Session State: 20260505_202138
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-04
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓ | Spell VFX System ✓
+- **Progress**: 20 / 22 MVP systems designed
+- **Next**: Audio Feedback System (design/gdd/audio-feedback-system.md — not yet created)
+- **Queue remaining**: Audio Feedback → Boss Dialogue UI
+---
+
+## Session End: 20260505_202138
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+design/gdd/systems-index.md
+production/session-logs/agent-audit.log
+production/session-logs/session-log.md
+production/session-state/active.md
+---
+
+## Archived Session State: 20260505_202316
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-04
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓ | Spell VFX System ✓
+- **Progress**: 20 / 22 MVP systems designed
+- **Next**: Audio Feedback System (design/gdd/audio-feedback-system.md — not yet created)
+- **Queue remaining**: Audio Feedback → Boss Dialogue UI
+---
+
+## Session End: 20260505_202316
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+design/gdd/systems-index.md
+production/session-logs/agent-audit.log
+production/session-logs/session-log.md
+production/session-state/active.md
+---
+
+## Archived Session State: 20260505_221104
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-05
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓ | Spell VFX System ✓ | Audio Feedback System ✓
+- **Progress**: 21 / 22 MVP systems designed
+- **Next**: Boss Dialogue UI (design/gdd/boss-dialogue-ui.md — not yet created)
+- **Queue remaining**: Boss Dialogue UI → /gate-check pre-production
+---
+
+## Session End: 20260505_221104
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+design/gdd/systems-index.md
+production/session-logs/agent-audit.log
+production/session-logs/session-log.md
+production/session-state/active.md
+---
+
+## Archived Session State: 20260505_221518
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-05
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓ | Spell VFX System ✓ | Audio Feedback System ✓ | Boss Dialogue UI ✓
+- **Progress**: 22 / 22 MVP systems designed ✅
+- **Next**: /gate-check pre-production — all MVP GDDs complete
+- **Queue remaining**: gate-check → architecture phase
+---
+
+## Session End: 20260505_221518
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+design/gdd/systems-index.md
+production/session-logs/agent-audit.log
+production/session-logs/session-log.md
+production/session-state/active.md
+---
+
+## Archived Session State: 20260507_174834
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-05
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓ | Spell VFX System ✓ | Audio Feedback System ✓ | Boss Dialogue UI ✓
+- **Progress**: 22 / 22 MVP systems designed ✅
+- **Next**: /gate-check pre-production — all MVP GDDs complete
+- **Queue remaining**: gate-check → architecture phase
+---
+
+## Session End: 20260507_174834
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+design/gdd/systems-index.md
+production/session-logs/agent-audit.log
+production/session-logs/session-log.md
+production/session-state/active.md
+---
+
+## Archived Session State: 20260508_175803
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-05
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓ | Spell VFX System ✓ | Audio Feedback System ✓ | Boss Dialogue UI ✓
+- **Progress**: 22 / 22 MVP systems designed ✅
+- **Next**: /gate-check pre-production — all MVP GDDs complete
+- **Queue remaining**: gate-check → architecture phase
+---
+
+## Session End: 20260508_175803
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+design/gdd/systems-index.md
+production/session-logs/agent-audit.log
+production/session-logs/session-log.md
+production/session-state/active.md
+---
+
+## Archived Session State: 20260508_175820
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-05
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓ | Spell VFX System ✓ | Audio Feedback System ✓ | Boss Dialogue UI ✓
+- **Progress**: 22 / 22 MVP systems designed ✅
+- **Next**: /gate-check pre-production — all MVP GDDs complete
+- **Queue remaining**: gate-check → architecture phase
+---
+
+## Session End: 20260508_175820
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+design/gdd/systems-index.md
+production/session-logs/agent-audit.log
+production/session-logs/session-log.md
+production/session-state/active.md
+---
+
+## Archived Session State: 20260508_175828
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-05
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓ | Spell VFX System ✓ | Audio Feedback System ✓ | Boss Dialogue UI ✓
+- **Progress**: 22 / 22 MVP systems designed ✅
+- **Next**: /gate-check pre-production — all MVP GDDs complete
+- **Queue remaining**: gate-check → architecture phase
+---
+
+## Session End: 20260508_175828
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+design/gdd/systems-index.md
+production/session-logs/agent-audit.log
+production/session-logs/session-log.md
+production/session-state/active.md
+---
+
+## Archived Session State: 20260508_175831
+# Active Session State
+
+- **Task**: Feature Layer GDDs — continuing
+- **Last updated**: 2026-05-05
+- **Completed this session**: Movement ✓ | Spell System ✓ | Enemy Base ✓ | Zone/Room ✓ | Spell Slot ✓ | Enemy AI ✓ | Hazard ✓ | Checkpoint/Respawn ✓ | Dialogue ✓ | Material ✓ | Spell Interaction Engine ✓ | Spell Upgrade System ✓ | Boss System ✓ | HUD System ✓ | Spell VFX System ✓ | Audio Feedback System ✓ | Boss Dialogue UI ✓
+- **Progress**: 22 / 22 MVP systems designed ✅
+- **Next**: /gate-check pre-production — all MVP GDDs complete
+- **Queue remaining**: gate-check → architecture phase
+---
+
+## Session End: 20260508_175831
+### Uncommitted Changes
+.claude/settings.local.json
+design/gdd/spell-vfx-system.md
+design/gdd/systems-index.md
+production/session-logs/agent-audit.log
+production/session-logs/session-log.md
+production/session-state/active.md
+---
+

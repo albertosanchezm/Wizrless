@@ -36,9 +36,9 @@ Wizrless is a metroidvania action-platformer built around three interlocking pil
 | 17 | Spell Upgrade System | Economy | MVP | In Design | design/gdd/spell-upgrade-system.md | Material System, Spell System |
 | 18 | Boss System | Gameplay | MVP | In Design | design/gdd/boss-system.md | Enemy Base, Health, Enemy AI, Spell Interaction Engine |
 | 19 | HUD System | UI | MVP | In Design | design/gdd/hud-system.md | Spell Slot, Health |
-| 20 | Spell VFX System | UI | MVP | Not Started | — | Spell System, Spell Interaction Engine |
-| 21 | Audio Feedback System (inferred) | Audio | MVP | Not Started | — | Spell System, Health, Audio |
-| 22 | Boss Dialogue UI (inferred) | UI | MVP | Not Started | — | Dialogue, Boss |
+| 20 | Spell VFX System | UI | MVP | In Design | design/gdd/spell-vfx-system.md | Spell System, Spell Interaction Engine |
+| 21 | Audio Feedback System (inferred) | Audio | MVP | In Design | design/gdd/audio-feedback-system.md | Spell System, Health, Audio |
+| 22 | Boss Dialogue UI (inferred) | UI | MVP | In Design | design/gdd/boss-dialogue-ui.md | Dialogue, Boss |
 | 23 | Ability Gate System | Gameplay | Vertical Slice | Not Started | — | Spell System, Zone/Room, Spell Slot |
 | 24 | Tutorial/Onboarding System (inferred) | Meta | Vertical Slice | Not Started | — | Movement, Spell System, Spell Slot |
 | 25 | Map System (inferred) | UI | Vertical Slice | Not Started | — | Zone/Room, Ability Gates |
@@ -192,7 +192,7 @@ Design these systems in order. Foundation-layer systems unblock everything else.
 | Design docs started | 19 |
 | Design docs reviewed | 5 |
 | Design docs approved | 3 |
-| MVP systems designed | 19 / 22 |
+| MVP systems designed | 22 / 22 |
 | Vertical Slice systems designed | 0 / 7 |
 | Alpha systems designed | 0 / 1 |
 

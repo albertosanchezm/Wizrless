@@ -19,7 +19,12 @@
       "Bash(Select-Object FullName)",
       "Bash(Select-String -Pattern \"\\(dialogue|dialog|conversation|cutscene|text_box\\)\")",
       "Bash(Get-ChildItem -Recurse -Filter \"*.gd\" \"C:\\\\Users\\\\alber\\\\Desktop\\\\Wizrless\\\\scripts\\\\spells\")",
-      "Bash(Select-Object -ExpandProperty FullName)"
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Test-Path *)",
+      "Skill(gate-check)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Skill(review-all-gdds)"
     ]
   }
 }
