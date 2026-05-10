@@ -2,7 +2,7 @@
 
 > **Status**: In Design
 > **Author**: Alberto Sánchez + Claude Code agents
-> **Last Updated**: 2026-05-02
+> **Last Updated**: 2026-05-09
 > **Implements Pillar**: Controlled Ascension (support), Earned Truth (support)
 
 ## Overview
@@ -13,7 +13,9 @@ At implementation level, the system provides a `BaseEnemy` GDScript class that a
 
 Two enemy categories exist: **regular enemies** (traversal threats in zones — patrol, aggro, attack, die) and **bosses** (narrative encounters — intro sequence, phase structure, unique attack patterns, combat barrier). Regular enemies extend `BaseEnemy` directly. Bosses extend `BaseEnemy` and add phase/intro logic in their own class. Devium (`class_name Devium`) is the first boss and the reference implementation.
 
-The system defines one status-effect pattern: **elemental vulnerability marks**. When a spell hits an enemy, the projectile calls `take_damage()` and optionally calls a typed hit handler (`on_fire_hit()`, `on_ice_hit()`, etc.) if the enemy supports it. Status effects are per-enemy, not centralized — each enemy class implements only the effects relevant to its design. Undefined hit handlers are no-ops on the base class.
+**Status effects are owned by the Spell Interaction Engine** (`spell-interaction-engine.md`), not BaseEnemy. The projectile calls `take_damage(amount, element)` with an element StringName; BaseEnemy routes through `SpellInteractionEngine.process_hit()` which decides what status to apply, what interaction fires, and what final damage lands. BaseEnemy carries the `active_statuses` dictionary and reacts to `status_applied`/`status_expired` signals to manage side effects (BURNING tick timer, FROZEN speed modifier).
+
+**Revision 2026-05-09:** The previous per-enemy `on_fire_hit() / on_ice_hit() / ...` handler pattern is **superseded** by the centralized engine. Devium's hardcoded BURN logic is replaced by the global BURNING status. See "Status Effect Pattern" section below.
 
 ## Player Fantasy
 
@@ -35,30 +37,29 @@ BaseEnemy
   max_health:   int
 
   # Runtime state
-  health:       int
-  is_dead:      bool          # true once death dispatched; blocks further damage
-  player:       CharacterBody2D  # resolved in _ready() from group &"player"
+  health:           int
+  is_dead:          bool                 # true once death dispatched; blocks further damage
+  player:           CharacterBody2D      # resolved in _ready() from group &"player"
+  active_statuses:  Dictionary           # { StringName: float expiry_time }, owned by Spell Interaction Engine
+  speed_modifier:   float = 1.0          # multiplied into AI velocity each frame; FROZEN sets 0.0, SLOWED sets 0.5
 
   # Required child nodes
-  @onready anim:    AnimatedSprite2D  # or AnimationPlayer
-  @onready hitbox:  Area2D            # receives player projectiles + player melee
+  @onready anim:    AnimatedSprite2D     # or AnimationPlayer
+  @onready hitbox:  Area2D               # receives player projectiles + player melee
+  @onready burn_timer: Timer             # used by BURNING DOT; started/stopped via status signals
 
   # Signals
   signal died
   signal health_changed(current: int, maximum: int)
 
   # Core methods
-  func take_damage(amount: int, element: SpellElement = SpellElement.NONE) -> void
+  func take_damage(amount: int, element: StringName = &"") -> void
   func die() -> void          # override in subclass for cleanup; call super()
   func face_player() -> void  # flips anim.flip_h toward player
 
-  # Element hit handlers — no-op base; override per enemy
-  func on_fire_hit() -> void
-  func on_ice_hit() -> void
-  func on_light_hit() -> void
-  func on_shadow_hit() -> void
-  func on_conjure_hit() -> void
-  func on_rupture_hit() -> void
+  # Status side-effect handlers (connected to SpellInteractionEngine signals in _ready)
+  func _on_status_applied(enemy: BaseEnemy, status: StringName, duration: float) -> void
+  func _on_status_expired(enemy: BaseEnemy, status: StringName) -> void
 ```
 
 ---
@@ -66,15 +67,15 @@ BaseEnemy
 ### Damage Reception Flow
 
 1. Projectile's `body_entered` or `area_entered` fires.
-2. Projectile calls `enemy.take_damage(damage_value, spell_element)`.
+2. Projectile calls `enemy.take_damage(damage_value, spell_element)` where `spell_element` is a `StringName` (e.g. `&"fire"`, `&"ice"`).
 3. `take_damage()` checks `is_dead` — returns immediately if true.
-4. `health = max(0, health - amount)`.
-5. `health_changed` signal emitted.
-6. `DamageNumber.spawn()` called at enemy position.
-7. Element hit handler called (`on_fire_hit()`, `on_ice_hit()`, etc.).
+4. **Routes through engine:** `var final := SpellInteractionEngine.process_hit(self, amount, element)` — engine resolves interactions, applies/refreshes statuses, returns final damage.
+5. `health = max(0, health - final)`.
+6. `health_changed` signal emitted.
+7. `DamageNumber.spawn()` called at enemy position with `final`.
 8. If `health == 0`: `is_dead = true` → `_hsm.dispatch(&"die")`.
 
-Melee hits (player hitbox area): same flow. Projectile `queue_free()` is the projectile's own responsibility.
+Element hit handlers are no longer called from `take_damage()` — the engine + status signals replace them. Melee hits (player hitbox area): same flow with `element = &""` (no interaction). Projectile `queue_free()` is the projectile's own responsibility.
 
 ---
 
@@ -131,14 +132,58 @@ Regular enemies: `&"enemy"` only. Bosses: `&"boss"` only. No enemy is in both.
 
 ### Status Effect Pattern
 
-Status effects are opt-in per enemy. `BaseEnemy` provides empty no-op handlers; subclasses override what they support.
+**Status effects are owned by the Spell Interaction Engine.** BaseEnemy is a passive participant: it carries `active_statuses` and reacts to `status_applied`/`status_expired` signals to manage side effects.
 
-**Burn (implemented on Devium):**
-- Two-hit mark: first fire hit sets mark for `BURN_WINDOW` seconds; second fire hit within window triggers burn
-- Burn ticks `BURN_DAMAGE` every `BURN_TICK` seconds for `BURN_DURATION` seconds
-- Refreshable: subsequent fire hits reset burn timer
+Three statuses at MVP — full spec in `spell-interaction-engine.md`:
 
-**Other elements (not yet implemented):** slow (Ice), blind (Light), weaken (Shadow), summon disruption (Conjure), armor break (Rupture). These are per-enemy design decisions — this system only establishes the handler interface.
+| Status | Applied by | Side effect on BaseEnemy |
+|--------|-----------|--------------------------|
+| `&"frozen"` | ICE element (3.0s) | `speed_modifier = 0.0` while active; reset to 1.0 on expire |
+| `&"burning"` | FIRE element (4.0s) | Start `burn_timer` at apply (1 dmg / 0.8s); stop on expire |
+| `&"marked"` | CONJURE element (5.0s) | None — combo catalyst only |
+
+Two derived statuses written by interaction effects (Cryoblast, Extinguish):
+
+| Status | Applied by | Side effect |
+|--------|-----------|-------------|
+| `&"stunned"` | Cryoblast interaction (1.5s) | AI states must check `&"stunned"` and no-op; or `speed_modifier = 0.0 + attack suppression` |
+| `&"slowed"` | Extinguish interaction (2.0s) | `speed_modifier = 0.5` while active; reset to 1.0 on expire |
+
+**Side-effect handler skeleton:**
+
+```gdscript
+func _ready() -> void:
+    # ... existing setup ...
+    SpellInteractionEngine.status_applied.connect(_on_status_applied)
+    SpellInteractionEngine.status_expired.connect(_on_status_expired)
+
+func _on_status_applied(target: BaseEnemy, status: StringName, _duration: float) -> void:
+    if target != self: return
+    match status:
+        &"frozen", &"stunned":
+            speed_modifier = 0.0
+        &"slowed":
+            speed_modifier = 0.5
+        &"burning":
+            burn_timer.start(BURN_TICK)
+        &"marked":
+            pass   # visual only — handled by VFX system
+
+func _on_status_expired(target: BaseEnemy, status: StringName) -> void:
+    if target != self: return
+    match status:
+        &"frozen", &"stunned", &"slowed":
+            speed_modifier = 1.0
+        &"burning":
+            burn_timer.stop()
+        &"marked":
+            pass
+
+func _on_burn_tick() -> void:
+    take_damage(BURN_TICK_DAMAGE, &"")   # element="" → no further interaction
+```
+
+**Devium burn migration:** Devium's previous bespoke `_fire_marked`/`_burn_timer` two-hit-mark logic is **removed**. Devium uses the global BURNING status applied by any FIRE hit. Two-hit-mark mechanic is gone — every fire hit primes burning. The Inferno interaction (BURNING + FIRE) replaces the old "second fire hit triggers burn" rule with "second fire hit refreshes BURNING and adds +3 instant damage".
 
 ---
 
@@ -146,7 +191,8 @@ Status effects are opt-in per enemy. `BaseEnemy` provides empty no-op handlers; 
 
 | System | Direction | Exchange |
 |--------|-----------|---------|
-| Spell System | Spell → Enemy | Projectile calls `take_damage(amount, element)` + element hit handler |
+| Spell System | Spell → Enemy | Projectile calls `take_damage(amount: int, element: StringName = &"")`; BaseEnemy routes through `SpellInteractionEngine.process_hit()` |
+| Spell Interaction Engine | Engine → Enemy | Engine writes `active_statuses` + emits `status_applied`/`status_expired`; BaseEnemy handlers react with side effects (timers, speed modifier) |
 | Enemy AI System | AI → Enemy | States read/write enemy velocity, health, `player` ref via HSM `agent` |
 | Boss System | Boss extends Enemy | Boss subclasses add phase/intro logic on top of `BaseEnemy` |
 | Save/Load System | Enemy → Save | Boss defeat state saved; regular enemy state not persisted at MVP |
@@ -166,25 +212,22 @@ phase2_threshold_hp = max_health × PHASE2_THRESHOLD
 health == 0  →  die()
 ```
 
-### Burn Status Effect (Devium reference implementation)
+### Burn (BURNING status — owned by Spell Interaction Engine)
 
 ```
 -- Activation:
-hit_1 → fire_marked = true, mark_timer = BURN_WINDOW (2.5s)
-hit_2 within BURN_WINDOW → burning = true, burn_timer = BURN_DURATION (4.0s)
+any FIRE hit → SpellInteractionEngine applies &"burning" for BURN_DURATION (4.0s)
 
 -- Tick damage:
 ticks = floor(BURN_DURATION / BURN_TICK) = floor(4.0 / 0.8) = 5 ticks
-total_burn_damage = 5 × BURN_DAMAGE = 5 × 1 = 5 HP
+total_burn_damage = 5 × BURN_TICK_DAMAGE = 5 × 1 = 5 HP
 
--- Full fire combo (two hits + full burn):
-direct_damage = FIREBALL_DAMAGE × 2 = 10 × 2 = 20 HP
-burn_damage   = 5 HP
-total         = 25 HP  (12.5% of Devium's 200 HP max)
-
--- Burn refresh (fire hit during active burn):
-burn_timer resets to BURN_DURATION; tick counter restarts
+-- Inferno interaction (BURNING + FIRE again):
+direct = base_fire_damage + 3 (additive)
+BURNING duration refreshed to 4.0s, tick counter continues
 ```
+
+`FIREBALL_DAMAGE = 20 HP` per direct hit (canonical value from `spell-system.md`). Devium's previous two-hit-mark logic has been removed — every fire hit primes BURNING immediately.
 
 ### Damage Number Color Convention
 
@@ -206,22 +249,21 @@ burn_timer resets to BURN_DURATION; tick counter restarts
 |----------|-------|-------|-------------|
 | `max_health` | Per enemy | Subclass | Total health pool |
 | `PHASE2_THRESHOLD` | 0.6 | Devium | HP ratio that triggers phase 2 |
-| `BURN_WINDOW` | 2.5 s | Devium | Window for second fire hit to activate burn |
-| `BURN_DURATION` | 4.0 s | Devium | How long burn lasts |
-| `BURN_TICK` | 0.8 s | Devium | Interval between burn damage ticks |
-| `BURN_DAMAGE` | 1 HP | Devium | Damage per burn tick |
-| `FIREBALL_DAMAGE` | 10 HP | Devium | Direct fire projectile damage taken |
+| `BURN_DURATION` | 4.0 s | Spell Interaction Engine | How long BURNING lasts |
+| `BURN_TICK` | 0.8 s | Spell Interaction Engine | Interval between burn damage ticks |
+| `BURN_TICK_DAMAGE` | 1 HP | Spell Interaction Engine | Damage per burn tick |
+| `FIREBALL_DAMAGE` | 20 HP | Spell System | Canonical Fireball direct damage (was 10 — corrected per W-08) |
 
 ## Edge Cases
 
 **EC-01 — Damage received while dead.**
 `take_damage()` checks `is_dead` first — returns immediately if true. No health change, no signal, no damage number, no element handler. In-flight projectiles colliding after death are silently ignored.
 
-**EC-02 — Burn mark expires before second fire hit.**
-`mark_timer` counts to zero — `_fire_marked` resets to false. Next fire hit starts a fresh mark. No burn triggers. Expected behavior.
+**EC-02 — (Removed)**
+Two-hit-mark mechanic deprecated 2026-05-09. Every FIRE hit primes BURNING immediately via Spell Interaction Engine.
 
-**EC-03 — Fire hit during active burn.**
-`burn_timer` resets to `BURN_DURATION`. No double-burn, no stack. Sustained fire barrage keeps enemy burning indefinitely. Intended: fire is the premium sustained-damage element.
+**EC-03 — Fire hit during active BURNING.**
+Inferno interaction fires (`BURNING + FIRE`): adds +3 instant damage and refreshes BURNING duration to 4.0s. Tick timer continues — no double-tick, no double DOT. Sustained fire barrage keeps enemy BURNING indefinitely with +3 bonus per refresh hit.
 
 **EC-04 — Enemy killed by burn tick.**
 Burn tick calls `take_damage(BURN_DAMAGE)`. If `health` reaches 0, `is_dead = true` and `&"die"` dispatches normally. Death flow identical to direct hit.
@@ -367,9 +409,9 @@ No HUD elements. Damage numbers are the only feedback. Intentional — regular e
 
 Owned by HUD System GDD. Enemy Base specifies signal contract only:
 
-- `GameManager.boss_appeared(boss_name, max_health)` — HUD shows bar
-- `GameManager.boss_health_changed(current, maximum)` — HUD updates bar
-- `GameManager.boss_defeated()` — HUD hides bar
+- `GameManager.boss_appeared(id: StringName, name: String, max_hp: int)` — HUD shows bar
+- `GameManager.boss_health_changed(current: int, maximum: int)` — HUD updates bar
+- `GameManager.boss_defeated(id: StringName)` — HUD hides bar
 
 Bar appears on `boss_appeared`, persists through fight, disappears on `boss_defeated` or `player_died`.
 

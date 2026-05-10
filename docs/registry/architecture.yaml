@@ -29,8 +29,8 @@
 #   All forbidden patterns: Grep pattern="^  - pattern:" (forbidden_patterns section)
 #   Superseded entries:     Grep pattern="status: superseded"
 
-version: 1
-last_updated: ""
+version: 2
+last_updated: "2026-05-10"
 
 # ─── STATE OWNERSHIP ─────────────────────────────────────────────────────────
 # Who is the authoritative owner of each piece of shared game state.
@@ -43,7 +43,17 @@ last_updated: ""
 # interface: how other systems access this state (read-only property, method call,
 #   signal, shared resource, etc.) — this is the contract other ADRs depend on.
 
-state_ownership: []
+state_ownership:
+  - state: dialogue_active
+    status: active
+    owner_system: game-manager
+    adr: docs/architecture/adr-0001-autoload-singleton-architecture.md
+    interface: "GameManager.dialogue_active (read-only bool for all non-GameManager systems; GameManager is sole writer)"
+    write_access: game-manager-only
+    referenced_by:
+      - docs/architecture/adr-0001-autoload-singleton-architecture.md
+    added: 2026-05-10
+    revised: ""
 
 # Example:
 #
@@ -71,7 +81,89 @@ state_ownership: []
 #
 # pattern options: signal | direct_call | event_bus | shared_resource | rpc | none
 
-interfaces: []
+interfaces:
+  - contract: autoload_access_pattern
+    status: active
+    pattern: direct_call
+    producer: all-autoload-singletons
+    consumers:
+      - all-game-systems
+    adr: docs/architecture/adr-0001-autoload-singleton-architecture.md
+    signal_signature: "n/a — defines method call pattern, not signal"
+    notes: "All autoloads accessed via registered name directly (SpellInteractionEngine.process_hit(...)). Never via get_node('/root/...') per call. Never via @onready cached reference."
+    referenced_by:
+      - docs/architecture/adr-0001-autoload-singleton-architecture.md
+    added: 2026-05-10
+    revised: ""
+
+  - contract: sfx_routing
+    status: active
+    pattern: direct_call
+    producer: all-game-systems
+    consumers:
+      - audio-system
+    adr: docs/architecture/adr-0001-autoload-singleton-architecture.md
+    signal_signature: "AudioSystem.play_sfx(stream: AudioStream, priority: AudioSystem.Priority, pitch_scale: float) -> void"
+    notes: "Single SFX entry point. No system calls AudioServer or AudioStreamPlayer directly."
+    referenced_by:
+      - docs/architecture/adr-0001-autoload-singleton-architecture.md
+    added: 2026-05-10
+    revised: ""
+
+  - contract: save_provider_registration
+    status: active
+    pattern: direct_call
+    producer: all-systems-with-persistent-state
+    consumers:
+      - save-manager
+    adr: docs/architecture/adr-0001-autoload-singleton-architecture.md
+    signal_signature: "SaveManager.register_save_provider(key: String, save_fn: Callable, load_fn: Callable) -> void"
+    notes: "Systems register their own save/load callbacks in _ready(). SaveManager orchestrates the full save payload."
+    referenced_by:
+      - docs/architecture/adr-0001-autoload-singleton-architecture.md
+    added: 2026-05-10
+    revised: ""
+
+  - contract: gamemanager_event_signals
+    status: active
+    pattern: signal
+    producer: game-manager
+    consumers:
+      - hud-system
+      - boss-system
+      - audio-feedback-system
+      - health-system
+      - movement-system
+    adr: docs/architecture/adr-0001-autoload-singleton-architecture.md
+    signal_signature: |
+      boss_appeared(id: StringName, name: String, max_hp: int)
+      boss_health_changed(current: int, maximum: int)
+      boss_defeated(id: StringName)
+      player_died
+      dialogue_started
+      dialogue_ended
+    referenced_by:
+      - docs/architecture/adr-0001-autoload-singleton-architecture.md
+    added: 2026-05-10
+    revised: ""
+
+  - contract: spell_interaction_signals
+    status: active
+    pattern: signal
+    producer: spell-interaction-engine
+    consumers:
+      - audio-feedback-system
+      - spell-vfx-system
+      - enemy-base-system
+    adr: docs/architecture/adr-0001-autoload-singleton-architecture.md
+    signal_signature: |
+      interaction_triggered(enemy: BaseEnemy, interaction_name: StringName, final_damage: int)
+      status_applied(enemy: BaseEnemy, status: StringName, duration: float)
+      status_expired(enemy: BaseEnemy, status: StringName)
+    referenced_by:
+      - docs/architecture/adr-0001-autoload-singleton-architecture.md
+    added: 2026-05-10
+    revised: ""
 
 # Example:
 #
@@ -131,7 +223,17 @@ performance_budgets: []
 # Register an API decision when the choice is non-obvious and other ADRs might
 # make a different choice for the same purpose without knowing this was decided.
 
-api_decisions: []
+api_decisions:
+  - purpose: aoe_circle_query_2d
+    status: active
+    api: "PhysicsDirectSpaceState2D.intersect_shape() with PhysicsShapeQueryParameters2D + CircleShape2D"
+    not: "PhysicsDirectSpaceState2D.intersect_circle() — method does not exist in any Godot 4.x release"
+    adr: docs/architecture/adr-0001-autoload-singleton-architecture.md
+    reason: "intersect_circle() is a fabricated method name. intersect_shape() with CircleShape2D is the correct Godot 4.6 API for AoE circle overlap queries. Confirmed by engine specialist 2026-05-10."
+    referenced_by:
+      - docs/architecture/adr-0001-autoload-singleton-architecture.md
+    added: 2026-05-10
+    revised: ""
 
 # Example:
 #
@@ -157,7 +259,20 @@ api_decisions: []
 # Register a pattern when an ADR explicitly bans it AND other ADRs might
 # unknowingly use it (i.e., it's a tempting but wrong approach for this project).
 
-forbidden_patterns: []
+forbidden_patterns:
+  - pattern: get_node_autoload_access
+    status: active
+    description: "Never use get_node('/root/SystemName') to access an autoload singleton per call site. Use the direct global accessor instead: SpellInteractionEngine.process_hit(...) not get_node('/root/SpellInteractionEngine').process_hit(...)."
+    why: "The global accessor is synthesized by Godot at parse time — get_node() is redundant, bypasses type safety, and is brittle to autoload renames. No performance benefit."
+    adr: docs/architecture/adr-0001-autoload-singleton-architecture.md
+    added: 2026-05-10
+
+  - pattern: onready_autoload_cache
+    status: active
+    description: "Never cache an autoload reference via @onready var x := get_node('/root/SystemName'). The global accessor already exists — caching it is unnecessary and creates a hidden dependency that breaks if the autoload is renamed."
+    why: "Autoload names are global constants in Godot 4. Caching them adds boilerplate without benefit and obfuscates the dependency in the class body."
+    adr: docs/architecture/adr-0001-autoload-singleton-architecture.md
+    added: 2026-05-10
 
 # Example:
 #

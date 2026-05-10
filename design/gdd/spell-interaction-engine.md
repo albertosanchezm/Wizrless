@@ -2,7 +2,7 @@
 
 > **Status**: In Design
 > **Author**: Alberto Sánchez + Claude Code agents
-> **Last Updated**: 2026-05-03
+> **Last Updated**: 2026-05-10
 > **Implements Pillar**: Spell Alchemy (primary) + Controlled Ascension (discovery reward)
 
 ## Overview
@@ -16,6 +16,13 @@ The engine works through **status effects**. Certain spells apply a status to an
 Order matters. Ice Shard hitting a burning enemy triggers Extinguish. Fireball hitting a frozen enemy triggers Steam Burst. These are different reactions because the status on the target is different — no global cast-history queue is needed. The target carries the context.
 
 The engine requires one breaking change to the existing damage API: `take_damage(amount, element)` must accept an element parameter. All callers must be updated.
+
+**Revision 2026-05-09 — Cross-GDD review fixes:**
+- Status tick now iterates both `&"enemy"` and `&"boss"` groups (was: nonexistent `&"enemies"`). Combos now apply to bosses.
+- `interaction_triggered` second param is now `interaction_name: StringName` (was: `element`). Subscribers route by interaction name, not element.
+- `_apply_status_if_primer` now emits `status_applied`. New `_apply_status` helper unifies all status writes through one emit point.
+- `_expire_status` now emits `status_expired` and is the single status-removal path.
+- BaseEnemy is now responsible for status side-effect cleanup via `status_applied`/`status_expired` handlers — engine stays pure data + signal.
 
 ## Player Fantasy
 
@@ -118,8 +125,9 @@ const INTERACTION_REGISTRY: Dictionary = {
 # SpellInteractionEngine.gd (autoload)
 
 func process_hit(enemy: BaseEnemy, base_damage: int, element: StringName) -> int:
-    var final_damage := base_damage
-    var now         := Time.get_ticks_msec() / 1000.0
+    var final_damage     := base_damage
+    var interaction_name : StringName = &""   # captured if interaction fires
+    var now              := Time.get_ticks_msec() / 1000.0
 
     # 1. Check active statuses for interaction
     for status in enemy.active_statuses.keys():
@@ -133,7 +141,8 @@ func process_hit(enemy: BaseEnemy, base_damage: int, element: StringName) -> int
             effect = INTERACTION_REGISTRY[key_wildcard]
 
         if not effect.is_empty():
-            final_damage = _apply_interaction(enemy, base_damage, effect, element)
+            interaction_name = effect.name as StringName
+            final_damage     = _apply_interaction(enemy, base_damage, effect, element)
             if effect.get("removes", false):
                 enemy.active_statuses.erase(status)
             break  # one interaction per hit
@@ -141,9 +150,9 @@ func process_hit(enemy: BaseEnemy, base_damage: int, element: StringName) -> int
     # 2. Apply status if this element is a primer
     _apply_status_if_primer(enemy, element, now)
 
-    # 3. Emit signal for HUD/VFX/audio
-    if final_damage != base_damage:
-        interaction_triggered.emit(enemy, element, final_damage)
+    # 3. Emit signal for HUD/VFX/audio (carries the interaction NAME, not the element)
+    if interaction_name != &"":
+        interaction_triggered.emit(enemy, interaction_name, final_damage)
 
     return final_damage
 ```
@@ -158,21 +167,21 @@ Each named effect maps to a method in `SpellInteractionEngine`:
 
 **Steam Burst (FROZEN + FIRE):**
 - Primary target: `base_damage × 2.0`
-- AoE: `PhysicsDirectSpaceState2D` overlap query, radius 80 px, enemy layer
+- AoE: `intersect_shape()` via `PhysicsShapeQueryParameters2D` + `CircleShape2D(radius=80)`, enemy layer mask, exclude primary target RID
 - Each enemy in radius: `take_damage(base_damage, &"fire")` — no element interaction, raw damage
 - Visual: explosion particle burst at target position
 - Sound: `sfx_steam_burst`
 
 **Cryoblast (FROZEN + RUPTURE):**
 - Primary target: `base_damage × 3.0`
-- Stun: `enemy.add_status(&"stunned", 1.5)` — enemy AI state paused
+- Stun: `_apply_status(enemy, &"stunned", 1.5)` — enemy AI state paused; emits `status_applied`
 - Visual: ice shard explosion outward
 - Sound: `sfx_cryoblast`
 
 **Extinguish (BURNING + ICE):**
 - Primary target: `base_damage × 1.5`
-- Removes BURNING status (ongoing tick stops)
-- Applies SLOWED: `enemy.active_statuses[&"slowed"] = now + 2.0`, movement speed × 0.5
+- Removes BURNING status (ongoing tick stops via `status_expired`)
+- Applies SLOWED: `_apply_status(enemy, &"slowed", 2.0)` — emits `status_applied`; movement speed × 0.5
 - Visual: steam cloud, fire extinguished
 - Sound: `sfx_extinguish`
 
@@ -207,10 +216,21 @@ func _apply_status_if_primer(enemy: BaseEnemy, element: StringName, now: float) 
     if not STATUS_APPLIERS.has(element): return
     var entry  := STATUS_APPLIERS[element]
     var status := entry.status as StringName
-    enemy.active_statuses[status] = now + entry.duration
+    var dur    : float = entry.duration
+    enemy.active_statuses[status] = now + dur
+    status_applied.emit(enemy, status, dur)   # fires on first apply AND refresh
+
+# Helper used by interaction effects (Cryoblast → stunned, Extinguish → slowed,
+# Inferno → burning refresh) to ensure every status mutation goes through one
+# emit point. All callers that write to `enemy.active_statuses` MUST go through
+# this helper rather than touching the dict directly.
+func _apply_status(enemy: BaseEnemy, status: StringName, duration: float) -> void:
+    var now := Time.get_ticks_msec() / 1000.0
+    enemy.active_statuses[status] = now + duration
+    status_applied.emit(enemy, status, duration)
 ```
 
-Applying a status the enemy already has simply overwrites the expiry — extends duration. Does not double-apply the ongoing effect.
+Applying a status the enemy already has simply overwrites the expiry — extends duration. Does not double-apply the ongoing effect. `status_applied` fires on every call (first apply and refresh) — subscribers (VFX overlay, audio cue) decide whether to restart their animation or no-op.
 
 ---
 
@@ -221,14 +241,25 @@ Applying a status the enemy already has simply overwrites the expiry — extends
 ```gdscript
 func _process(_delta: float) -> void:
     var now := Time.get_ticks_msec() / 1000.0
-    for enemy in get_tree().get_nodes_in_group(&"enemies"):
+    # Iterate BOTH groups — regular enemies live in &"enemy", bosses in &"boss"
+    # (per enemy-base-system.md). A status applied to a boss must still tick.
+    for enemy in get_tree().get_nodes_in_group(&"enemy"):
         _tick_statuses(enemy as BaseEnemy, now)
+    for boss in get_tree().get_nodes_in_group(&"boss"):
+        _tick_statuses(boss as BaseEnemy, now)
 
 func _tick_statuses(enemy: BaseEnemy, now: float) -> void:
+    if enemy == null or enemy.is_dead:
+        return
     for status in enemy.active_statuses.keys():
         if now >= enemy.active_statuses[status]:
             _expire_status(enemy, status)
-            enemy.active_statuses.erase(status)
+
+func _expire_status(enemy: BaseEnemy, status: StringName) -> void:
+    enemy.active_statuses.erase(status)
+    status_expired.emit(enemy, status)
+    # Side-effect cleanup hooks (BURNING tick timer stop, FROZEN speed restore)
+    # are owned by BaseEnemy's status_expired handler — keeps the engine pure.
 ```
 
 BURNING tick damage is a separate `Timer` on the enemy — started when BURNING applied, stopped when BURNING removed or expired. `SpellInteractionEngine` signals the enemy to start/stop the burn timer; the enemy's own `Timer` node fires the DOT.
@@ -264,12 +295,16 @@ This is the breaking API change mentioned in Overview. Every call site (hazards,
 
 ```gdscript
 # SpellInteractionEngine signals:
-signal interaction_triggered(enemy: BaseEnemy, element: StringName, final_damage: int)
+signal interaction_triggered(enemy: BaseEnemy, interaction_name: StringName, final_damage: int)
 signal status_applied(enemy: BaseEnemy, status: StringName, duration: float)
 signal status_expired(enemy: BaseEnemy, status: StringName)
 ```
 
-HUD/VFX system subscribes to `interaction_triggered` for combo text. Audio subscribes for combo sounds. No caller needs to know what interaction fired — the signal carries what happened.
+`interaction_triggered`'s second parameter is the **interaction name** (e.g. `&"steam_burst"`, `&"cryoblast"`), NOT the incoming element. Subscribers (HUD combo text, VFX burst lookup, audio routing table) key off the interaction name to pick the right asset. The element is intentionally not exposed — by the time the signal fires the player wants to know "what combo just happened", not "what element did I throw".
+
+`status_applied` fires on first apply AND on refresh (status already active, duration overwritten). VFX overlays should treat refresh as a re-trigger; audio cues fire on every call.
+
+`status_expired` fires once when the status duration elapses. BaseEnemy is responsible for the side-effect cleanup (stop BURNING tick timer, reset FROZEN speed modifier) — the engine only emits.
 
 ---
 
@@ -343,9 +378,23 @@ attack_suppressed     = false  (frozen enemy can still attack — just can't mov
 
 ```
 AoE radius   = 80 px
-Query method = PhysicsDirectSpaceState2D.intersect_circle(origin, radius, exclude=[primary])
 Damage dealt = base_damage (no multiplier for secondary targets)
 Element      = &"fire"  (secondary hits can trigger interactions on other frozen enemies)
+
+Query method (Godot 4.6):
+  var space_state := get_world_2d().direct_space_state
+  var shape := CircleShape2D.new()
+  shape.radius = 80.0
+  var params := PhysicsShapeQueryParameters2D.new()
+  params.shape = shape
+  params.transform = Transform2D(0.0, primary_target.global_position)
+  params.collision_mask = enemy_layer_mask
+  params.exclude = [primary_target.get_rid()]
+  var hits: Array[Dictionary] = space_state.intersect_shape(params)
+  # Each hit: hits[i].collider.take_damage(base_damage, &"fire")
+
+Note: PhysicsDirectSpaceState2D has no intersect_circle() method.
+Use intersect_shape() with PhysicsShapeQueryParameters2D + CircleShape2D.
 ```
 
 ### Status Duration Precedence
@@ -382,7 +431,7 @@ Stack:   NOT supported. One instance per status per enemy.
 Secondary `take_damage()` call includes element `&"fire"`. That secondary enemy checks its own `active_statuses`. If it is also FROZEN: another Steam Burst fires on it. Chain reaction is valid and intentional. In practice, two FROZEN enemies adjacent is a rare level design scenario.
 
 **EC-03 — Enemy dies during status tick.**
-`_expire_status()` checks `enemy.is_dead` — if dead, skips tick and removes status. No damage after death. `active_statuses` is cleared in enemy `_on_die()`. No dangling timers.
+`_tick_statuses()` early-returns if `enemy == null or enemy.is_dead` — no expire emit, no dangling state. `active_statuses` is cleared in enemy `_on_die()`. BURNING tick timer is stopped by BaseEnemy's `status_expired` handler when the death-driven clear fires `status_expired` for each remaining status.
 
 **EC-04 — Devium enters Phase 2 while BURNING.**
 Status persists through phase transition. BURNING tick timer continues. Phase 2 entry does not clear `active_statuses`. Correct — continuous status should not reward phase transitions.
@@ -411,11 +460,11 @@ Autoload order in `project.godot` must place `SpellInteractionEngine` before any
 |--------|-----------|----------------------|
 | **Spell System** | Reads | Spell element (`StringName`) from SpellResource used as `incoming_element` in interaction lookup |
 | **Spell Slot System** | Reads | Currently equipped spell determines element passed to `process_hit()` |
-| **Enemy Base System** | Modifies | Adds `active_statuses: Dictionary` and `speed_modifier: float` to BaseEnemy. Replaces `take_damage()` signature. |
+| **Enemy Base System** | Modifies | Adds `active_statuses: Dictionary`, `speed_modifier: float`, and `is_dead: bool` to BaseEnemy. Replaces `take_damage()` signature to `take_damage(amount: int, element: StringName = &"")`. BaseEnemy must connect to `status_applied` and `status_expired` signals to handle side effects (BURNING tick timer start/stop, FROZEN speed modifier set/reset). Group membership unchanged: regular enemies in `&"enemy"`, bosses in `&"boss"` — engine iterates BOTH groups during status tick. |
 | **Health System** | Downstream | Final damage from `process_hit()` feeds into the same health reduction path |
 | **Boss System** | Consumer | Devium's existing BURN logic replaced by this engine. All boss enemies wire into `process_hit()`. |
-| **HUD / Spell VFX System** | Subscriber | `interaction_triggered` signal drives combo text and VFX |
-| **Audio Feedback System** | Subscriber | `interaction_triggered` drives combo-specific SFX |
+| **HUD / Spell VFX System** | Subscriber | `interaction_triggered(enemy, interaction_name, final_damage)` drives combo text and VFX burst lookup; `status_applied(enemy, status, duration)` and `status_expired(enemy, status)` drive overlay show/hide |
+| **Audio Feedback System** | Subscriber | `interaction_triggered(enemy, interaction_name, final_damage)` drives combo SFX routing table; `status_applied(enemy, status, duration)` drives status apply cues |
 
 **Reverse dependencies:**
 - Spell Upgrade System may increase `base_damage` before it enters `process_hit()` — multipliers then apply on top of upgraded base.
@@ -435,6 +484,9 @@ Autoload order in `project.godot` must place `SpellInteractionEngine` before any
 | Inferno bonus | +3 flat | +1–+8 | Small bonus — the real value is DOT refresh for sustained pressure. |
 | Stun duration (Cryoblast) | 1.5 s | 0.8–3.0 s | Long enough to dodge or reposition. Above 3.0: trivializes boss. |
 | Slow fraction (Extinguish) | 0.5 | 0.25–0.75 | 0.5 = half speed. 0.25 = quarter (too subtle). 0.75 = nearly stopped (too close to FROZEN). |
+
+**Implementation guardrail — status tick performance:**
+`_process()` calls `get_tree().get_nodes_in_group()` twice per frame (enemy + boss). Each call allocates a new Array. At low counts (≤20 enemies) cost is negligible. Above ~50 simultaneous enemies: cache the lists and invalidate on node `tree_entered`/`tree_exiting` signals, or use a registration pattern (enemies call `SpellInteractionEngine.register(self)` in `_ready()` and `unregister(self)` in `_exit_tree()`). Implement caching if profiling shows status tick above 0.5 ms/frame.
 
 ## Acceptance Criteria
 

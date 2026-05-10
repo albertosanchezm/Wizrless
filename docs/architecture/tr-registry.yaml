@@ -24,33 +24,1105 @@
 #
 # STATUS VALUES: active | deprecated | superseded-by: TR-[system]-NNN
 
-version: 1
-last_updated: ""
+version: 3
+last_updated: "2026-05-10"
 
-requirements: []
+requirements:
 
-# --- EXAMPLE ENTRIES (remove when first real entries are added) ---
-#
-# - id: TR-combat-001
-#   system: combat
-#   gdd: design/gdd/combat-system.md
-#   requirement: "Player takes damage from enemies based on attack power minus defence"
-#   created: 2026-03-10
-#   revised: ""
-#   status: active
-#
-# - id: TR-combat-002
-#   system: combat
-#   gdd: design/gdd/combat-system.md
-#   requirement: "Combo window timing is 0.4 seconds between hits"
-#   created: 2026-03-10
-#   revised: "2026-04-01"
-#   status: active
-#
-# - id: TR-combat-003
-#   system: combat
-#   gdd: design/gdd/combat-system.md
-#   requirement: "Old damage formula using raw stats"
-#   created: 2026-03-10
-#   revised: ""
-#   status: superseded-by: TR-combat-001
+  # ============================================================
+  # FOUNDATION LAYER
+  # ============================================================
+
+  # --- Input System ---
+  - id: TR-input-001
+    system: input
+    gdd: design/gdd/input-system.md
+    requirement: "Canonical action set of 21 actions registered in InputMap (cast, cycle_spell_forward/backward, select_slot_1..5, interact, ui_accept, ui_cancel, pause, plus movement)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-input-002
+    system: input
+    gdd: design/gdd/input-system.md
+    requirement: "Context stack routes input to one of three contexts: gameplay, dialogue, ui"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-input-003
+    system: input
+    gdd: design/gdd/input-system.md
+    requirement: "Radial deadzone (0.20) applied to analog stick input"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-input-004
+    system: input
+    gdd: design/gdd/input-system.md
+    requirement: "ui_stick_threshold (0.60) for repeat events on UI navigation"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-input-005
+    system: input
+    gdd: design/gdd/input-system.md
+    requirement: "Both keyboard/mouse and gamepad bindings registered per action"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Audio System ---
+  - id: TR-audio-001
+    system: audio
+    gdd: design/gdd/audio-system.md
+    requirement: "Five audio buses: Master, Music, SFX, UI, Voice with independent volume control"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audio-002
+    system: audio
+    gdd: design/gdd/audio-system.md
+    requirement: "SFX pool with 16 simultaneous AudioStreamPlayer slots"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audio-003
+    system: audio
+    gdd: design/gdd/audio-system.md
+    requirement: "Priority-based eviction: GUARANTEED > HIGH > NORMAL > LOW"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audio-004
+    system: audio
+    gdd: design/gdd/audio-system.md
+    requirement: "Music state machine with 9 states and priority-driven transitions"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audio-005
+    system: audio
+    gdd: design/gdd/audio-system.md
+    requirement: "BOSS_PREFIGHT to BOSS_FIGHT transition driven by music track length (track is the clock)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audio-006
+    system: audio
+    gdd: design/gdd/audio-system.md
+    requirement: "Voice ducking -6 dB on Music+SFX with reference-counted notify_voice_start/end"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audio-007
+    system: audio
+    gdd: design/gdd/audio-system.md
+    requirement: "play_sfx(stream, priority, pitch_scale) is the single SFX entry point"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Save/Load System ---
+  - id: TR-save-001
+    system: save
+    gdd: design/gdd/save-load-system.md
+    requirement: "JSON save format with atomic write (write to temp file, rename)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-save-002
+    system: save
+    gdd: design/gdd/save-load-system.md
+    requirement: "Save triggers: checkpoint activation, boss defeat, zone transition"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-save-003
+    system: save
+    gdd: design/gdd/save-load-system.md
+    requirement: "Provider registration pattern: register_save_provider(key, save_fn, load_fn)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-save-004
+    system: save
+    gdd: design/gdd/save-load-system.md
+    requirement: "Flag-based API: SaveManager.get_flag(key) / set_flag(key, value) for room/cache state"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-save-005
+    system: save
+    gdd: design/gdd/save-load-system.md
+    requirement: "save_version field in payload for migration support"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-save-006
+    system: save
+    gdd: design/gdd/save-load-system.md
+    requirement: "Known save keys registered: health, spells, zones, checkpoints, materials, spell_upgrades, bosses, lore, seen_dialogues, slot_count, known_spell_ids, equipped_spell_ids, active_index"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Camera System ---
+  - id: TR-camera-001
+    system: camera
+    gdd: design/gdd/camera-system.md
+    requirement: "PhantomCamera2D addon used for all in-game camera modes"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-camera-002
+    system: camera
+    gdd: design/gdd/camera-system.md
+    requirement: "Four pcam priority levels: EXPLORATION 0, COMBAT 10, BOSS_ROOM 20, DIALOGUE 25"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-camera-003
+    system: camera
+    gdd: design/gdd/camera-system.md
+    requirement: "Camera mode switching uses visibility-based deactivation (never set_priority(-1))"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-camera-004
+    system: camera
+    gdd: design/gdd/camera-system.md
+    requirement: "Player death scene reload resets pcam priorities to default state"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-camera-005
+    system: camera
+    gdd: design/gdd/camera-system.md
+    requirement: "DIALOGUE pcam mode activated by Narrative System (not Boss System directly)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # ============================================================
+  # CORE LAYER
+  # ============================================================
+
+  # --- Health System ---
+  - id: TR-health-001
+    system: health
+    gdd: design/gdd/health-system.md
+    requirement: "Player HP scale: BASE_HEALTH=6, max=14 with 4 upgrades (UPGRADE_INCREMENT=2)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-health-002
+    system: health
+    gdd: design/gdd/health-system.md
+    requirement: "Iframe duration IFRAME_DURATION=0.8s after damage"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-health-003
+    system: health
+    gdd: design/gdd/health-system.md
+    requirement: "Damage flow: iframe check → clamp → reduce → emit health_changed → emit player_damaged → set iframes → check death → emit player_died"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-health-004
+    system: health
+    gdd: design/gdd/health-system.md
+    requirement: "Signals: health_changed(current, max), player_damaged(amount), player_died"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-health-005
+    system: health
+    gdd: design/gdd/health-system.md
+    requirement: "respawn() restores current_health = max_health"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-health-006
+    system: health
+    gdd: design/gdd/health-system.md
+    requirement: "Damage flow honors dialogue_active flag (full invulnerability during dialogue) [REQUIRES GDD REVISION — W-02]"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-health-007
+    system: health
+    gdd: design/gdd/health-system.md
+    requirement: "heal(amount) method clamps to max_health and emits health_changed [REQUIRES GDD ADDITION — B-06]"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Movement System ---
+  - id: TR-movement-001
+    system: movement
+    gdd: design/gdd/movement-system.md
+    requirement: "Player state machine via LimboHSM: Idle, Run, Jump, Fall, Dash, Attack, Death"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-movement-002
+    system: movement
+    gdd: design/gdd/movement-system.md
+    requirement: "Ground locomotion: SPEED=90 px/s; jump VELOCITY=-325; GRAVITY=900; FALL_GRAVITY=1400"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-movement-003
+    system: movement
+    gdd: design/gdd/movement-system.md
+    requirement: "Dash: DASH_SPEED=220 px/s, DASH_DURATION=0.18s"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-movement-004
+    system: movement
+    gdd: design/gdd/movement-system.md
+    requirement: "Ability gating via GameManager.has_ability(ability_id) for Dash, wall-jump, etc."
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-movement-005
+    system: movement
+    gdd: design/gdd/movement-system.md
+    requirement: "Player root is CharacterBody2D; movement uses move_and_slide()"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Spell System ---
+  - id: TR-spell-001
+    system: spell
+    gdd: design/gdd/spell-system.md
+    requirement: "SpellResource (.tres) data model with damage, mana_cost, cooldown, element, projectile_scene, icon"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-spell-002
+    system: spell
+    gdd: design/gdd/spell-system.md
+    requirement: "Six MVP spells: Fireball (20/25), Ice Shard (15/25), Light Bolt (18/25), Shadow Tendril (12/25), Conjure (0/25), Rupture (25/35)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-spell-003
+    system: spell
+    gdd: design/gdd/spell-system.md
+    requirement: "Mana: MAX_MANA=100, MANA_REGEN_RATE=10/s, MANA_REGEN_DELAY=1.5s after cast"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-spell-004
+    system: spell
+    gdd: design/gdd/spell-system.md
+    requirement: "ATTACK_COOLDOWN=1.5s shared across spell casts (single global cooldown)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-spell-005
+    system: spell
+    gdd: design/gdd/spell-system.md
+    requirement: "Cast flow: mana check → cooldown check → AttackState → animation → projectile spawn → spell_cast signal"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-spell-006
+    system: spell
+    gdd: design/gdd/spell-system.md
+    requirement: "Signals: mana_changed(current, max), attack_cooldown_changed(remaining, total), spell_cast"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-spell-007
+    system: spell
+    gdd: design/gdd/spell-system.md
+    requirement: "Cast bound to action 'cast' (was 'attack' in early draft) — see W-03 reconciliation"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Enemy Base System ---
+  - id: TR-enemy-001
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "BaseEnemy extends CharacterBody2D as common base for regular enemies and bosses"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-enemy-002
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "take_damage(amount: int, element: StringName = \"\") API — StringName type unified with SpellInteractionEngine"
+    created: 2026-05-09
+    revised: "2026-05-10"
+    status: active
+  - id: TR-enemy-003
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "Group membership: regular enemies in &\"enemy\", bosses in &\"boss\""
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-enemy-004
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "Per-instance died signal emitted on health <= 0"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-enemy-005
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "HP range: regular enemies 5–30 HP, bosses 100–300 HP"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-enemy-006
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "No iframes on base enemies (every projectile contact registers)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-enemy-007
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "active_statuses dictionary on each enemy instance for status effect tracking"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # ============================================================
+  # FEATURE LAYER
+  # ============================================================
+
+  # --- Zone/Room System ---
+  - id: TR-zone-001
+    system: zone
+    gdd: design/gdd/zone-room-system.md
+    requirement: "Room is a scene loaded into RoomContainer node at game level (not nested under player)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-zone-002
+    system: zone
+    gdd: design/gdd/zone-room-system.md
+    requirement: "Player node persists across room transitions (lives at game level, not inside room scene)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-zone-003
+    system: zone
+    gdd: design/gdd/zone-room-system.md
+    requirement: "ZoneResource (.tres) for logical zone grouping and metadata"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-zone-004
+    system: zone
+    gdd: design/gdd/zone-room-system.md
+    requirement: "RoomExit Area2D with required_ability field gates traversal"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-zone-005
+    system: zone
+    gdd: design/gdd/zone-room-system.md
+    requirement: "Room transition pipeline: fade 0.3s → free old room → load new → physics frame → reposition player → fade in"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-zone-006
+    system: zone
+    gdd: design/gdd/zone-room-system.md
+    requirement: "Room state persistence via SaveManager flag-based API (get_flag/set_flag)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-zone-007
+    system: zone
+    gdd: design/gdd/zone-room-system.md
+    requirement: "Room._ready() guards set_respawn() — must NOT overwrite if active checkpoint is in same room [REQUIRES GDD REVISION — W-01]"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Spell Slot System ---
+  - id: TR-slot-001
+    system: slot
+    gdd: design/gdd/spell-slot-system.md
+    requirement: "SpellSlotSystem is an autoload singleton"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-slot-002
+    system: slot
+    gdd: design/gdd/spell-slot-system.md
+    requirement: "slots: Array[SpellResource] with 1–5 entries, dynamic resize on milestone unlock"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-slot-003
+    system: slot
+    gdd: design/gdd/spell-slot-system.md
+    requirement: "active_index tracks which slot is selected for casting"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-slot-004
+    system: slot
+    gdd: design/gdd/spell-slot-system.md
+    requirement: "Slot count progression tied to story milestones (not currency-based)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-slot-005
+    system: slot
+    gdd: design/gdd/spell-slot-system.md
+    requirement: "Slot cycling skips null slots"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-slot-006
+    system: slot
+    gdd: design/gdd/spell-slot-system.md
+    requirement: "Save payload: slot_count, known_spell_ids, equipped_spell_ids, active_index"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-slot-007
+    system: slot
+    gdd: design/gdd/spell-slot-system.md
+    requirement: "Signals: active_spell_changed, slot_unlocked, loadout_changed"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Enemy AI System ---
+  - id: TR-ai-001
+    system: ai
+    gdd: design/gdd/enemy-ai-system.md
+    requirement: "Per-enemy state machine via LimboHSM: Patrol → Aggro → Attack → Return"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-ai-002
+    system: ai
+    gdd: design/gdd/enemy-ai-system.md
+    requirement: "All AI tuning exposed via @export properties (data-driven per enemy scene)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-ai-003
+    system: ai
+    gdd: design/gdd/enemy-ai-system.md
+    requirement: "chase_speed must remain below player SPEED (90 px/s) so player can outrun"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-ai-004
+    system: ai
+    gdd: design/gdd/enemy-ai-system.md
+    requirement: "Weighted attack selection with no-repeat-last rule (boss + complex enemies)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-ai-005
+    system: ai
+    gdd: design/gdd/enemy-ai-system.md
+    requirement: "Parabolic projectile spawn formula for arc attacks"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Hazard System ---
+  - id: TR-hazard-001
+    system: hazard
+    gdd: design/gdd/hazard-system.md
+    requirement: "Three hazard types: GroundSpike (timed warning + damage window), DamageZone (persistent tick), KillZone (instant)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-hazard-002
+    system: hazard
+    gdd: design/gdd/hazard-system.md
+    requirement: "All hazard damage routes through GameManager.take_damage()"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-hazard-003
+    system: hazard
+    gdd: design/gdd/hazard-system.md
+    requirement: "Hazard damage values calibrated against Health System 6–14 HP scale [REQUIRES RECALIBRATION — B-01]"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Checkpoint/Respawn System ---
+  - id: TR-checkpoint-001
+    system: checkpoint
+    gdd: design/gdd/checkpoint-respawn-system.md
+    requirement: "Checkpoint Area2D with one-shot _activated flag (cannot re-trigger same checkpoint)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-checkpoint-002
+    system: checkpoint
+    gdd: design/gdd/checkpoint-respawn-system.md
+    requirement: "On activation: GameManager.set_checkpoint(room, position) → save_game()"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-checkpoint-003
+    system: checkpoint
+    gdd: design/gdd/checkpoint-respawn-system.md
+    requirement: "Respawn priority: active checkpoint same room > active checkpoint other room > room entrance"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-checkpoint-004
+    system: checkpoint
+    gdd: design/gdd/checkpoint-respawn-system.md
+    requirement: "Room._ready() must NOT call set_respawn() if checkpoint_room == self.scene_file_path (paired with TR-zone-007)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Dialogue System ---
+  - id: TR-dialogue-001
+    system: dialogue
+    gdd: design/gdd/dialogue-system.md
+    requirement: "Dialogue Manager v2 addon as the dialogue runtime"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-dialogue-002
+    system: dialogue
+    gdd: design/gdd/dialogue-system.md
+    requirement: "Two entry points: show_dialogue_balloon() (default) and show_dialogue_balloon_scene(scene, ...) (custom balloon)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-dialogue-003
+    system: dialogue
+    gdd: design/gdd/dialogue-system.md
+    requirement: "PORTRAIT_REGISTRY dictionary maps speaker IDs to portrait textures"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-dialogue-004
+    system: dialogue
+    gdd: design/gdd/dialogue-system.md
+    requirement: "GameManager.dialogue_active flag suppresses gameplay input and grants player invulnerability"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-dialogue-005
+    system: dialogue
+    gdd: design/gdd/dialogue-system.md
+    requirement: "Signals: dialogue_started, dialogue_ended (forwarded from DialogueManager)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-dialogue-006
+    system: dialogue
+    gdd: design/gdd/dialogue-system.md
+    requirement: "seen_dialogues set persisted in save payload to prevent re-trigger"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Material System ---
+  - id: TR-material-001
+    system: material
+    gdd: design/gdd/material-system.md
+    requirement: "Six material types, one per spell element: ember, frost, radiance, void_shard, aether, shatter"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-material-002
+    system: material
+    gdd: design/gdd/material-system.md
+    requirement: "GameManager.materials: Dictionary stores per-type counts"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-material-003
+    system: material
+    gdd: design/gdd/material-system.md
+    requirement: "MaterialDrop Area2D auto-collected on player proximity"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-material-004
+    system: material
+    gdd: design/gdd/material-system.md
+    requirement: "Finite world supply — drops do not respawn, caches are one-shot"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-material-005
+    system: material
+    gdd: design/gdd/material-system.md
+    requirement: "MaterialCache persistence via SaveManager.is_cache_collected/mark_cache_collected"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-material-006
+    system: material
+    gdd: design/gdd/material-system.md
+    requirement: "Signal: material_collected(type, amount, new_total)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Spell Interaction Engine ---
+  - id: TR-interaction-001
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "SpellInteractionEngine is an autoload singleton"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-interaction-002
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "Three status effects with durations: frozen 3s, burning 4s, marked 5s"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-interaction-003
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "Five interactions: Steam Burst (frozen+fire ×2.0 + 80px AoE), Cryoblast (frozen+rupture ×3.0 + 1.5s stun), Extinguish (burning+ice ×1.5 + slow), Amplify (marked+any ×1.5), Inferno (burning+fire +3 flat + DOT refresh)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-interaction-004
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "process_hit(enemy: BaseEnemy, base_damage: int, element: StringName) is the single entry point for spell impact resolution"
+    created: 2026-05-09
+    revised: "2026-05-10"
+    status: active
+  - id: TR-interaction-005
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "Status tick covers BOTH &\"enemy\" and &\"boss\" groups — bosses receive status effects (B-02 resolved)"
+    created: 2026-05-09
+    revised: "2026-05-10"
+    status: active
+  - id: TR-interaction-006
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "take_damage element parameter type unified as StringName across BaseEnemy and SpellInteractionEngine (B-03 resolved)"
+    created: 2026-05-09
+    revised: "2026-05-10"
+    status: active
+  - id: TR-interaction-007
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "Signal: interaction_triggered(enemy: BaseEnemy, interaction_name: StringName, final_damage: int) — interaction_name not element (B-04 resolved)"
+    created: 2026-05-09
+    revised: "2026-05-10"
+    status: active
+  - id: TR-interaction-008
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "Signal: status_applied(enemy: BaseEnemy, status: StringName, duration: float) — fired on first apply and refresh (B-05 resolved)"
+    created: 2026-05-09
+    revised: "2026-05-10"
+    status: active
+  - id: TR-interaction-009
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "Signal: status_expired(enemy: BaseEnemy, status: StringName) — fired when status duration ends (B-05 resolved)"
+    created: 2026-05-09
+    revised: "2026-05-10"
+    status: active
+
+  # --- Spell Upgrade System ---
+  - id: TR-upgrade-001
+    system: upgrade
+    gdd: design/gdd/spell-upgrade-system.md
+    requirement: "Three tiers per spell with material costs [5, 8, 12]"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-upgrade-002
+    system: upgrade
+    gdd: design/gdd/spell-upgrade-system.md
+    requirement: "Element-locked materials: each spell uses only its element's material for upgrades"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-upgrade-003
+    system: upgrade
+    gdd: design/gdd/spell-upgrade-system.md
+    requirement: "Projectile reads upgrade tier in _ready() via GameManager.get_upgrade_tier(spell_id)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-upgrade-004
+    system: upgrade
+    gdd: design/gdd/spell-upgrade-system.md
+    requirement: "UpgradeShrine in-world interactable opens upgrade UI"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-upgrade-005
+    system: upgrade
+    gdd: design/gdd/spell-upgrade-system.md
+    requirement: "Signal: upgrade_applied(spell_id, new_tier)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-upgrade-006
+    system: upgrade
+    gdd: design/gdd/spell-upgrade-system.md
+    requirement: "Tier effects may invoke player methods (e.g. heal); requires HealthSystem.heal API [DEPENDS ON B-06 FIX]"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Boss System ---
+  - id: TR-boss-001
+    system: boss
+    gdd: design/gdd/boss-system.md
+    requirement: "BaseBoss extends BaseEnemy as common boss base class"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-boss-002
+    system: boss
+    gdd: design/gdd/boss-system.md
+    requirement: "BossConfig resource (.tres) drives per-boss configuration (HP, element, phases, attack table)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-boss-003
+    system: boss
+    gdd: design/gdd/boss-system.md
+    requirement: "CombatBarrier seals the boss room on dialogue end and deactivates on player_died"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-boss-004
+    system: boss
+    gdd: design/gdd/boss-system.md
+    requirement: "BossTrigger one-shot Area2D activates BossIdleState (pre-fight dialogue + barrier)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-boss-005
+    system: boss
+    gdd: design/gdd/boss-system.md
+    requirement: "Phase transitions via LimboHSM ANYSTATE dispatch on HP threshold"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-boss-006
+    system: boss
+    gdd: design/gdd/boss-system.md
+    requirement: "Attack selection: weighted random + no-repeat-last + distance bias"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-boss-007
+    system: boss
+    gdd: design/gdd/boss-system.md
+    requirement: "die() flow: emit boss_defeated → barrier fade → spawn material drop → wait 1.5s → queue_free"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-boss-008
+    system: boss
+    gdd: design/gdd/boss-system.md
+    requirement: "Signals: boss_appeared(id, name, max_hp), boss_health_changed(current, max), boss_defeated(id)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-boss-009
+    system: boss
+    gdd: design/gdd/boss-system.md
+    requirement: "Boss defeat triggers immediate save_game() (not only on next checkpoint)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # ============================================================
+  # PRESENTATION LAYER
+  # ============================================================
+
+  # --- HUD System ---
+  - id: TR-hud-001
+    system: hud
+    gdd: design/gdd/hud-system.md
+    requirement: "HUD root is a CanvasLayer at layer 10"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-hud-002
+    system: hud
+    gdd: design/gdd/hud-system.md
+    requirement: "Pure subscriber pattern — HUD never polls game state, all updates are signal-driven"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-hud-003
+    system: hud
+    gdd: design/gdd/hud-system.md
+    requirement: "Health pip row dynamically rebuilds when max_health changes"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-hud-004
+    system: hud
+    gdd: design/gdd/hud-system.md
+    requirement: "Mana bar with low-mana color shift at MANA_LOW_THRESHOLD=25"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-hud-005
+    system: hud
+    gdd: design/gdd/hud-system.md
+    requirement: "Spell slot row 1–5 dynamic frames with cooldown radial overlay on active slot"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-hud-006
+    system: hud
+    gdd: design/gdd/hud-system.md
+    requirement: "Boss bar deferred until dialogue_ended; reveals with 0.5s fade-in [REQUIRES GDD REVISION — W-06]"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-hud-007
+    system: hud
+    gdd: design/gdd/hud-system.md
+    requirement: "Material toast 2.0s and upgrade toast 2.5s lifetimes; stack vertically without overlap"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-hud-008
+    system: hud
+    gdd: design/gdd/hud-system.md
+    requirement: "HUD elements suppressed while GameManager.dialogue_active is true [REQUIRES GDD REVISION — W-06]"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Spell VFX System ---
+  - id: TR-vfx-001
+    system: vfx
+    gdd: design/gdd/spell-vfx-system.md
+    requirement: "SpellVFXSpawner is an autoload singleton routing interaction VFX bursts"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-vfx-002
+    system: vfx
+    gdd: design/gdd/spell-vfx-system.md
+    requirement: "StatusVFXComponent attached as child of each enemy scene; renders status overlays"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-vfx-003
+    system: vfx
+    gdd: design/gdd/spell-vfx-system.md
+    requirement: "Per-spell projectile scenes own their own VFX (sprite, trail particles, impact burst)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-vfx-004
+    system: vfx
+    gdd: design/gdd/spell-vfx-system.md
+    requirement: "Interaction burst scenes preloaded into BURST_SCENES dictionary for runtime lookup"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-vfx-005
+    system: vfx
+    gdd: design/gdd/spell-vfx-system.md
+    requirement: "Interaction bursts spawned to scene root (not enemy child) so they survive enemy queue_free"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-vfx-006
+    system: vfx
+    gdd: design/gdd/spell-vfx-system.md
+    requirement: "Hit flash on every projectile contact (white modulate, 0.05s hold + 0.10s fade)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-vfx-007
+    system: vfx
+    gdd: design/gdd/spell-vfx-system.md
+    requirement: "Design budget: ≤12 simultaneous CPUParticles2D emitters per room"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Audio Feedback System ---
+  - id: TR-audiofb-001
+    system: audiofb
+    gdd: design/gdd/audio-feedback-system.md
+    requirement: "AudioFeedbackSystem autoload routes game events to AudioSystem.play_sfx (no direct AudioServer use)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audiofb-002
+    system: audiofb
+    gdd: design/gdd/audio-feedback-system.md
+    requirement: "SFX routing table maps event → (resource_path, priority, base_pitch, pitch_variance)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audiofb-003
+    system: audiofb
+    gdd: design/gdd/audio-feedback-system.md
+    requirement: "Interaction SFX priorities: steam_burst HIGH, cryoblast HIGH, extinguish/amplify/inferno NORMAL"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audiofb-004
+    system: audiofb
+    gdd: design/gdd/audio-feedback-system.md
+    requirement: "Status SFX priorities: frozen NORMAL, burning/marked LOW (apply only, no expire SFX at MVP)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audiofb-005
+    system: audiofb
+    gdd: design/gdd/audio-feedback-system.md
+    requirement: "Combat feedback priorities: player_hurt GUARANTEED, player_death GUARANTEED (variance 0), enemy_death NORMAL"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audiofb-006
+    system: audiofb
+    gdd: design/gdd/audio-feedback-system.md
+    requirement: "Pitch formula: clamp(base_pitch + randf_range(-variance, variance), 0.5, 2.0)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-audiofb-007
+    system: audiofb
+    gdd: design/gdd/audio-feedback-system.md
+    requirement: "Dynamic enemy subscription via get_tree().node_added; covers BOTH &\"enemy\" and &\"boss\" groups [REQUIRES GDD REVISION — W-07]"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # --- Boss Dialogue UI ---
+  - id: TR-bossui-001
+    system: bossui
+    gdd: design/gdd/boss-dialogue-ui.md
+    requirement: "WizrlessBossBalloon custom Dialogue Manager balloon at CanvasLayer layer=5"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-bossui-002
+    system: bossui
+    gdd: design/gdd/boss-dialogue-ui.md
+    requirement: "DimOverlay alpha 0.55, balloon entry tween 0.3s (ease-out cubic), exit tween 0.25s (ease-in cubic)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-bossui-003
+    system: bossui
+    gdd: design/gdd/boss-dialogue-ui.md
+    requirement: "can_advance input guard blocks advance during entry and exit tweens"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-bossui-004
+    system: bossui
+    gdd: design/gdd/boss-dialogue-ui.md
+    requirement: "HUD boss bar visibility deferred until dialogue_ended (paired with TR-hud-006)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-bossui-005
+    system: bossui
+    gdd: design/gdd/boss-dialogue-ui.md
+    requirement: "BOSS_BAR_REVEAL_DURATION 0.5s fade-in after dialogue_ended"
+    created: 2026-05-09
+    revised: ""
+    status: active
+  - id: TR-bossui-006
+    system: bossui
+    gdd: design/gdd/boss-dialogue-ui.md
+    requirement: "PortraitFrame visibility derived from PORTRAIT_REGISTRY presence (hidden if not registered or texture null)"
+    created: 2026-05-09
+    revised: ""
+    status: active
+
+  # ============================================================
+  # ADDITIONS FROM /architecture-review 2026-05-10
+  # (from revised enemy-base-system.md and spell-interaction-engine.md)
+  # ============================================================
+
+  # --- Enemy Base System (additions) ---
+  - id: TR-enemy-008
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "speed_modifier: float = 1.0 on BaseEnemy — multiplied into AI velocity per frame; FROZEN/STUNNED set to 0.0, SLOWED set to 0.5, reset to 1.0 on status expire"
+    created: 2026-05-10
+    revised: ""
+    status: active
+  - id: TR-enemy-009
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "health_changed(current: int, maximum: int) signal defined on BaseEnemy (distinct from HealthSystem's player health signal)"
+    created: 2026-05-10
+    revised: ""
+    status: active
+  - id: TR-enemy-010
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "burn_timer: Timer required child node on BaseEnemy; started when BURNING status applied, stopped when BURNING expires or enemy dies"
+    created: 2026-05-10
+    revised: ""
+    status: active
+  - id: TR-enemy-011
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "BaseEnemy._ready() connects SpellInteractionEngine.status_applied and status_expired signals to local _on_status_applied/_on_status_expired handlers"
+    created: 2026-05-10
+    revised: ""
+    status: active
+  - id: TR-enemy-012
+    system: enemy
+    gdd: design/gdd/enemy-base-system.md
+    requirement: "DamageNumber.spawn(parent, amount, position, color) called from take_damage() with element-driven color; suppressed when amount == 0"
+    created: 2026-05-10
+    revised: ""
+    status: active
+
+  # --- Spell Interaction Engine (additions) ---
+  - id: TR-interaction-010
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "Derived statuses &\"stunned\" (1.5 s, from Cryoblast) and &\"slowed\" (2.0 s, from Extinguish) defined and written by SpellInteractionEngine._apply_status()"
+    created: 2026-05-10
+    revised: ""
+    status: active
+  - id: TR-interaction-011
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "_processing_interaction bool guard in process_hit() prevents Steam Burst AoE secondary calls from triggering further interactions (recursion depth overflow prevention)"
+    created: 2026-05-10
+    revised: ""
+    status: active
+  - id: TR-interaction-012
+    system: interaction
+    gdd: design/gdd/spell-interaction-engine.md
+    requirement: "SpellInteractionEngine must be listed before GameManager in project.godot autoload order to ensure it is ready when enemies call take_damage() in _ready()"
+    created: 2026-05-10
+    revised: ""
+    status: active
