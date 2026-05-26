@@ -31,6 +31,7 @@ The system exposes a single public entry point: `take_damage(amount: int)`. All 
 
 **Damage Intake Flow** — executed in this exact order, no exceptions:
 
+0. If `GameManager.dialogue_active`, discard the hit and return. No signal is emitted. Player is fully invulnerable during any active dialogue.
 1. If `iframe_timer > 0`, discard the hit and return. No signal is emitted.
 2. Clamp `amount` to `max(0, amount)`. Negative damage is silently ignored.
 3. Reduce current health: `current_health = max(0, current_health - amount)`.
@@ -54,7 +55,9 @@ The system exposes a single public entry point: `take_damage(amount: int)`. All 
 | Boss hit | 2 |
 | Boss special attack | 3 |
 
-**No regeneration**: `current_health` never increases except through `respawn()` or `add_max_health()`. No passive regen, no healing pickups beyond upgrades.
+**Heal**: `heal(amount: int) -> void` increases `current_health` by `amount`, clamped to `max_health`. Emits `health_changed(current_health, max_health)`. Does not interact with iframes (heal is never a damage event). Called by SpellUpgradeSystem for vampiric upgrade effects (e.g. T2 Shadow Tendril: `heal(5)`).
+
+**No passive regeneration**: `current_health` never increases passively. No regen ticks, no healing pickups beyond `add_max_health()` upgrades. The only active heal path is `heal(amount)` for explicit game-event healing.
 
 ### States and Transitions
 
@@ -77,6 +80,7 @@ INVINCIBLE is a substate of ALIVE — health is positive, the wizard simply cann
 | Boss System | `take_damage(2)` or `take_damage(3)` | amount: int |
 | Checkpoint/Respawn System | `respawn()` | — |
 | Progression System | `add_max_health(UPGRADE_INCREMENT)` | increment: int |
+| SpellUpgrade System | `heal(amount)` | amount: int — vampiric upgrade effects |
 
 **Downstream — systems that subscribe to Health System signals:**
 

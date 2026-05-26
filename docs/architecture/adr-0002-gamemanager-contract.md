@@ -1,7 +1,7 @@
 # ADR-0002: GameManager — Signal Hub and Player State Contract
 
 ## Status
-Proposed
+Accepted
 
 ## Date
 2026-05-10

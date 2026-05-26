@@ -116,7 +116,15 @@ Visual barrier: child `Node2D` named `GateLock` on the `RoomExit` node. Shown wh
 
 ### Checkpoint / Respawn
 
-`GameManager.set_respawn(position, room_id, scene_path)` called in every `Room._ready()`. Sets last-entered room as respawn point.
+`GameManager.set_respawn(position, room_id, scene_path)` called in `Room._ready()` — **only if the active checkpoint is not in this room**:
+
+```gdscript
+# Room._ready() guard — prevents overwriting an active checkpoint on respawn
+if GameManager.checkpoint_room != self.scene_file_path:
+    GameManager.set_respawn(spawn_point.global_position, room_id, scene_file_path)
+```
+
+Without this guard, respawning into the checkpoint room would overwrite the checkpoint with the room entrance position — the checkpoint would become a one-shot benefit.
 
 On `player_died`:
 1. Health reset to max.
@@ -124,6 +132,8 @@ On `player_died`:
 3. Player returns to start of last room entered.
 
 **No mid-room checkpoints at MVP.** Checkpoint/Respawn System extends this by calling `set_respawn()` explicitly from safe-room triggers.
+
+**Dependency note:** This section depends on Checkpoint/Respawn System's `checkpoint_room` field on GameManager. See `checkpoint-respawn-system.md`.
 
 ---
 

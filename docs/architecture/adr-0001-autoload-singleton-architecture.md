@@ -1,7 +1,7 @@
 # ADR-0001: Autoload Singleton Architecture
 
 ## Status
-Proposed
+Accepted
 
 ## Date
 2026-05-10

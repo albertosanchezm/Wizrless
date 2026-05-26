@@ -24,7 +24,10 @@
       "Skill(gate-check)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Skill(review-all-gdds)"
+      "Skill(review-all-gdds)",
+      "Bash(Get-Content \"C:\\\\Users\\\\alber\\\\Desktop\\\\Wizrless\\\\docs\\\\architecture\\\\tr-registry.yaml\")",
+      "Bash(Select-String \"adr_target|id:\")",
+      "Skill(architecture-decision)"
     ]
   }
 }

@@ -163,36 +163,58 @@ Empty slot: `SpellIcon` shows `null_spell_icon.png` (dim placeholder). No cooldo
 
 ### Boss Health Bar
 
-Hidden until `boss_appeared`. Shows boss name + health bar. Anchored top-center.
+Hidden until the boss fight begins. Shows boss name + health bar. Anchored top-center.
+
+**Deferral rule**: `boss_appeared` fires before the boss pre-fight dialogue. The bar must NOT reveal immediately — it reveals only after `dialogue_ended` fires (or immediately if no dialogue is active). This prevents the bar from floating over the dim dialogue overlay.
+
+**Reveal animation**: 0.5s fade-in tween on `modulate.a` from 0.0 → 1.0 (`BOSS_BAR_REVEAL_DURATION = 0.5`).
 
 ```gdscript
 @onready var _boss_bar_container: VBoxContainer      = $TopCenter/BossBarContainer
 @onready var _boss_name_label:    Label              = $TopCenter/BossBarContainer/BossNameLabel
 @onready var _boss_health_bar:    TextureProgressBar = $TopCenter/BossBarContainer/BossHealthBar
 
-func _ready() -> void:
-    _boss_bar_container.hide()
-    GameManager.boss_appeared.connect(_on_boss_appeared)
-    GameManager.boss_health_changed.connect(_on_boss_health_changed)
-    GameManager.boss_defeated.connect(_on_boss_defeated)
-    GameManager.player_died.connect(_on_player_died)
+const BOSS_BAR_REVEAL_DURATION := 0.5
+
+var _boss_bar_pending := false   # true when boss_appeared received but dialogue active
 
 func _on_boss_appeared(_id: StringName, display_name: String, max_hp: int) -> void:
     _boss_name_label.text  = display_name
     _boss_health_bar.value = 1.0
+    if GameManager.dialogue_active:
+        _boss_bar_pending = true   # defer until dialogue_ended
+    else:
+        _reveal_boss_bar()
+
+func _reveal_boss_bar() -> void:
+    _boss_bar_pending = false
+    _boss_bar_container.modulate.a = 0.0
     _boss_bar_container.show()
+    create_tween().tween_property(_boss_bar_container, "modulate:a", 1.0, BOSS_BAR_REVEAL_DURATION)
+
+func _on_dialogue_ended() -> void:
+    if _boss_bar_pending:
+        _reveal_boss_bar()
 
 func _on_boss_health_changed(current: int, maximum: int) -> void:
     _boss_health_bar.value = float(current) / float(maximum)
 
 func _on_boss_defeated(_id: StringName) -> void:
+    _boss_bar_pending = false
     _boss_bar_container.hide()
 
 func _on_player_died() -> void:
+    _boss_bar_pending = false
     _boss_bar_container.hide()
 ```
 
 Bar dimensions: 240×10 px. Boss name label: centered above bar, 14pt, bold. Bar color: element-tinted (set from `BossConfig.element` on `boss_appeared`).
+
+### Dialogue Suppression
+
+During `GameManager.dialogue_active`, the HUD hides the gameplay elements that are visually disruptive behind the dialogue overlay. The boss bar is suppressed via the deferral rule above. Health pips, mana bar, and spell slots remain visible — they are anchored to the HUD CanvasLayer (layer 10) which sits above the dialogue dim overlay (layer 5). No explicit hide/show on those elements during dialogue at MVP; they are covered by the overlay visually.
+
+If full HUD suppression is needed in a future pass, connect to `GameManager.dialogue_started/dialogue_ended` and toggle `_health_row.visible`, `_mana_bar.visible`, and `_slot_row.visible`.
 
 ---
 
@@ -256,6 +278,7 @@ func _ready() -> void:
     GameManager.boss_health_changed.connect(_on_boss_health_changed)
     GameManager.boss_defeated.connect(_on_boss_defeated)
     GameManager.player_died.connect(_on_player_died)
+    GameManager.dialogue_ended.connect(_on_dialogue_ended)
     GameManager.material_collected.connect(_on_material_collected)
     GameManager.upgrade_applied.connect(_on_upgrade_applied)
     _sync_initial_state()

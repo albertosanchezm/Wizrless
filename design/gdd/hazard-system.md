@@ -29,7 +29,7 @@ Three types. All extend `Area2D`.
 
 | Type | Script | Scene | Behavior | Damage |
 |------|--------|-------|----------|--------|
-| GroundSpike | `scripts/hazards/ground_spike.gd` | `scenes/hazards/ground_spike.tscn` | Timed: appear → active → retract → despawn | `DAMAGE = 20` on `body_entered` during active window |
+| GroundSpike | `scripts/hazards/ground_spike.gd` | `scenes/hazards/ground_spike.tscn` | Timed: appear → active → retract → despawn | `DAMAGE = 2` on `body_entered` during active window |
 | DamageZone | `scripts/hazards/damage_zone.gd` | `scenes/hazards/damage_zone.tscn` | Persistent: always active, damages on enter + optional tick | Configurable via `@export` |
 | KillZone | `scripts/hazards/kill_zone.gd` | `scenes/hazards/kill_zone.tscn` | Persistent: instant-kill on contact (pit void, insta-death surfaces) | `GameManager.take_damage(MAX_INT)` → triggers death |
 
@@ -73,7 +73,7 @@ GroundSpike (Area2D)
 @export var retract_time: float = 0.15
 ```
 
-Damage: `GameManager.take_damage(DAMAGE)` where `DAMAGE = 20` (class constant, not exported — change requires code edit or subclass).
+Damage: `GameManager.take_damage(DAMAGE)` where `DAMAGE = 2` (class constant, not exported — change requires code edit or subclass).
 
 One damage instance per overlap entry. Player standing on active spike and exiting then re-entering is hit again. No invulnerability frame handling in hazard code — that is the Health System's concern.
 
@@ -90,7 +90,7 @@ DamageZone (Area2D)
 
 **Exported variables:**
 ```gdscript
-@export var damage_on_enter:   int   = 5
+@export var damage_on_enter:   int   = 1
 @export var tick_damage:       int   = 0      # 0 = no tick
 @export var tick_interval:     float = 1.0    # seconds between ticks
 @export var visual_color:      Color = Color(1.0, 0.4, 0.0, 0.35)  # shown as modulated ColorRect child
@@ -202,16 +202,17 @@ Minimum recommended: 0.10 s (1–2 frames at 60fps). Below 0.10 s: no reasonable
 ```
 D_total = damage_on_enter + floor(T_stay / tick_interval) × tick_damage
 
-Example (lava floor, stay 3 s, tick_damage=5, tick_interval=1.0):
-  D_total = 5 + floor(3 / 1.0) × 5 = 5 + 15 = 20
+Example (lava floor, stay 3 s, tick_damage=1, tick_interval=1.0):
+  D_total = 1 + floor(3 / 1.0) × 1 = 1 + 3 = 4
 ```
 
 ### Hit Budget per Hazard Contact (design guideline)
 
 ```
-Player max HP = 100 (reference — Health System GDD owns this)
-GroundSpike:  20 / 100 = 20% per hit → 5 hits to die
-DamageZone:    5 enter + ticking → zone controls pressure, not burst
+Health scale = 6–14 HP (reference — Health System GDD owns this)
+GroundSpike:  2 / 6 = 33% per hit at base HP → 3 hits to die
+              2 / 14 = 14% per hit at max HP → 7 hits to die
+DamageZone:   1 enter + optional tick (1/s default) → sustained pressure, not burst
 KillZone:    100% — instant
 ```
 
@@ -222,8 +223,8 @@ KillZone:    100% — instant
 | `appear_time` | float | 0.15 s | GroundSpike rise duration |
 | `active_time` | float | 1.2 s | GroundSpike damage window |
 | `retract_time` | float | 0.15 s | GroundSpike retract duration |
-| `DAMAGE` | int | 20 | GroundSpike damage constant |
-| `damage_on_enter` | int | 5 | DamageZone entry damage |
+| `DAMAGE` | int | 2 | GroundSpike damage constant |
+| `damage_on_enter` | int | 1 | DamageZone entry damage |
 | `tick_damage` | int | 0 | DamageZone per-tick damage (0 = off) |
 | `tick_interval` | float | 1.0 s | DamageZone tick period |
 | `visual_color` | Color | orange 35% | DamageZone overlay tint |
@@ -281,9 +282,9 @@ Player falls through without triggering. Level design authoring error — no run
 | `appear_time` | 0.15 s | 0.10–1.0 s | Reaction window before spike is deadly. Below 0.10: unreactionable (boss use only). Above 1.0: predictable but slow-paced. |
 | `active_time` | 1.2 s | 0.3–3.0 s | How long spike threatens. Below 0.3: barely a threat. Above 3.0: spike dominates room for too long. |
 | `retract_time` | 0.15 s | 0.05–0.5 s | Cosmetic — affects rhythm feel, not gameplay threat. |
-| `DAMAGE` (GroundSpike) | 20 | 10–40 | 20 = 1/5 of HP. 10 = minor chip. 40 = punishing. Scale with zone difficulty. |
-| `damage_on_enter` | 5 | 1–30 | DamageZone entry burst. 5 = minor entry tax. 30 = strong entry deterrent. |
-| `tick_damage` | 0 | 0–10 | Per-tick DamageZone punishment. 0 = no tick. 10/s drains 100% HP in 10 s — extremely punishing. |
+| `DAMAGE` (GroundSpike) | 2 | 1–4 | 2 = 33% base HP per hit (3 hits to die). 1 = minor chip. 4 = one-third max HP — punishing but survivable. Never exceed 6 (instant kill at base HP). |
+| `damage_on_enter` | 1 | 1–3 | DamageZone entry burst. 1 = standard entry tax. 3 = strong deterrent; keep brief-contact zones at 1. Never exceed 3 (half base HP). |
+| `tick_damage` | 0 | 0–2 | Per-tick DamageZone punishment. 0 = no tick. 2/s = extreme pressure (kills base HP in 3 s). Pair low tick_damage with high tick_interval. |
 | `tick_interval` | 1.0 s | 0.5–3.0 s | DamageZone tick frequency. 0.5 = aggressive. 3.0 = almost unnoticeable. Pair with `tick_damage` to set pressure. |
 | `visual_color` | Orange 35% | Any | DamageZone visual hint. Alpha must stay 25–50%: readable but not obscuring. |
 
@@ -293,13 +294,13 @@ Player falls through without triggering. Level design authoring error — no run
 Static GroundSpike placed in room: on room load, spike rises (`appear_time`), stays active (`active_time`), retracts (`retract_time`), then `queue_free()`. Sprite animates through all three phases. Verified by: place spike in room, observe full cycle.
 
 **AC-02 — GroundSpike damages player in active window only.**
-Player standing on spike during active window takes 20 damage (damage number appears, health bar decreases). Player standing on rising or retracting spike takes no damage. Verified by: step on spike at each phase.
+Player standing on spike during active window takes 2 damage (damage number appears, health bar decreases). Player standing on rising or retracting spike takes no damage. Verified by: step on spike at each phase.
 
 **AC-03 — DamageZone entry damage.**
 Player entering DamageZone (tick_damage=0) takes `damage_on_enter` once. Exiting and re-entering takes it again. Timer does not run. Verified by: enter, exit, re-enter zone.
 
 **AC-04 — DamageZone tick damage.**
-Player inside DamageZone with `tick_damage=5`, `tick_interval=1.0` takes 5 damage on entry + 5 damage each second while inside. Exiting stops the tick. Verified by: enter zone, observe damage log over 3 seconds.
+Player inside DamageZone with `tick_damage=1`, `tick_interval=1.0` takes 1 damage on entry + 1 damage each second while inside. Exiting stops the tick. Verified by: enter zone, observe damage log over 3 seconds.
 
 **AC-05 — KillZone instant kill.**
 Player entering KillZone loses all HP and triggers death sequence. Debug invulnerability must be disabled for this test. Verified by: disable HP floor in GameManager, walk into KillZone, confirm death.

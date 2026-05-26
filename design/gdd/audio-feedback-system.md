@@ -36,7 +36,7 @@ Combat hurt and death sounds are GUARANTEED — they cut through every other SFX
 
 ### Architecture
 
-`AudioFeedbackSystem` is an autoload singleton. On `_ready()` it connects to signals from `SpellInteractionEngine` and `HealthSystem` (both autoloads). It also subscribes to enemy `died` signals dynamically — any node that enters the scene tree and belongs to group `&"enemies"` has its `died` signal connected automatically.
+`AudioFeedbackSystem` is an autoload singleton. On `_ready()` it connects to signals from `SpellInteractionEngine` and `HealthSystem` (both autoloads). It also subscribes to `died` signals dynamically — any node that enters the scene tree and belongs to group `&"enemies"` **or** `&"boss"` has its `died` signal connected automatically.
 
 `AudioFeedbackSystem` never touches `AudioStreamPlayer` nodes or `AudioServer` directly. Every SFX call goes through `AudioSystem.play_sfx(stream, priority, pitch_scale)`. `AudioFeedbackSystem` is a routing and context layer, not a playback layer.
 
@@ -46,9 +46,10 @@ SpellInteractionEngine.status_applied         →  _on_status_applied(enemy, sta
 HealthSystem.player_damaged                   →  _on_player_damaged(amount)
 HealthSystem.player_died                      →  _on_player_died()
 BaseEnemy.died (per-instance)                 →  _on_enemy_died()
+BaseBoss.died (per-instance)                  →  _on_enemy_died()   # same handler — boss death SFX
 ```
 
-Enemy subscription flow: `AudioFeedbackSystem._ready()` calls `get_tree().node_added.connect(_on_node_added)`. `_on_node_added(node)` checks `node.is_in_group(&"enemies")`. If true, `node.died.connect(_on_enemy_died)`.
+Enemy/boss subscription flow: `AudioFeedbackSystem._ready()` calls `get_tree().node_added.connect(_on_node_added)`. `_on_node_added(node)` checks `node.is_in_group(&"enemies") or node.is_in_group(&"boss")`. If true, `node.died.connect(_on_enemy_died)`.
 
 ---
 
@@ -159,7 +160,7 @@ Both `player_died` and `interaction_triggered` fire in the same frame. Rule: bot
 Not possible: Autoloads initialise before scene nodes in Godot 4. `_ready()` connection to `node_added` is established before any gameplay node's `_ready()` fires.
 
 **E7 — Enemy spawned at runtime after scene loads**
-`get_tree().node_added` fires for the new enemy node. `_on_node_added` checks `is_in_group(&"enemies")` — true — connects `died` signal. Correct: all dynamically spawned enemies are covered.
+`get_tree().node_added` fires for the new enemy node. `_on_node_added` checks `is_in_group(&"enemies") or is_in_group(&"boss")` — connects `died` signal if either group matches. Covers both regular enemies and the boss node. Correct: all dynamically spawned combat nodes are covered.
 
 **E8 — Player hurt during i-frame window**
 HealthSystem blocks the damage, emits no `player_damaged` signal. No SFX fires. Correct: the player should not hear a hurt sound for hits they are immune to.
